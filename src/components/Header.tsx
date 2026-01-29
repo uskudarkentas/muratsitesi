@@ -29,7 +29,7 @@ export default function Header() {
                     <div className="relative">
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="text-primary font-bold flex items-center gap-1 hover:opacity-80 transition-opacity"
+                            className="text-primary font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
                         >
                             Aşamalar
                             <span className="material-symbols-outlined !text-xl">

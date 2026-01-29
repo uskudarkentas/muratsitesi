@@ -139,6 +139,13 @@ export function TimelineItem({
                         <span className="material-symbols-outlined !text-[12px] animate-spin">sync</span>
                     </span>
                 )}
+                {/* Future State - Added as requested */}
+                {isFuture && (
+                    <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                        Sürece Başlanmadı
+                        <span className="material-symbols-outlined !text-[12px]">lock</span>
+                    </span>
+                )}
             </div>
 
             {/* Center Icon Circle */}
@@ -148,7 +155,9 @@ export function TimelineItem({
                 }}
                 className={cn(
                     "relative flex items-center justify-center rounded-full z-20 transition-all duration-300 cursor-pointer",
-                    isCurrent ? "size-20" : "size-16"
+                    stage.variant === 'small'
+                        ? (isCurrent ? "size-14" : "size-10") // Smaller sizes for 'small' variant (Temsili Sözleşme)
+                        : (isCurrent ? "size-20" : "size-16") // Standard sizes
                 )}
                 onClick={() => {
                     if (window.innerWidth < 768) {
@@ -161,8 +170,14 @@ export function TimelineItem({
                 {/* Glow effects for active */}
                 {isCurrent && (
                     <>
-                        <div className="absolute inset-0 rounded-full bg-[#98EB94]/20 animate-ping"></div>
-                        <div className="absolute -inset-3 rounded-full border-4 border-[#98EB94]/20"></div>
+                        <div className={cn(
+                            "absolute inset-0 rounded-full animate-ping",
+                            stage.variant === 'small' ? "bg-red-200" : "bg-[#98EB94]/20"
+                        )}></div>
+                        <div className={cn(
+                            "absolute -inset-3 rounded-full border-4",
+                            stage.variant === 'small' ? "border-red-200" : "border-[#98EB94]/20"
+                        )}></div>
                     </>
                 )}
 
@@ -170,19 +185,32 @@ export function TimelineItem({
                 <div
                     className={cn(
                         "relative w-full h-full rounded-full flex items-center justify-center transition-all duration-300",
+                        // Base colors
                         isPast && "bg-primary border-2 border-primary shadow-md",
-                        isCurrent &&
-                        "bg-white dark:bg-gray-900 border-4 border-[#98EB94] shadow-[0_0_20px_rgba(152,235,148,0.4)]",
-                        isFuture && "bg-[#F2F2F7] border-2 border-[#F2F2F7]"
+                        isCurrent && "bg-white dark:bg-gray-900 border-4 border-[#98EB94] shadow-[0_0_20px_rgba(152,235,148,0.4)]",
+                        isFuture && "bg-[#F2F2F7] border-2 border-[#F2F2F7]",
+
+                        // Overrides for 'small' variant (Temsili Sözleşme) - GOLD STYLE
+                        stage.variant === 'small' && "bg-[#FCD535] border-none shadow-sm", // Solid Yellow/Gold
+                        stage.variant === 'small' && isCurrent && "shadow-[0_0_20px_rgba(252,213,53,0.6)] scale-110" // Gold glow if active
                     )}
                 >
                     <span
                         className={cn(
                             "material-symbols-outlined transition-all",
-                            isCurrent ? "!text-4xl text-[#98EB94]" : "!text-3xl",
+                            // Size logic
+                            isCurrent ? "!text-4xl" : "!text-3xl",
+                            stage.variant === 'small' && "!text-xl", // Fixed small size for icon
+
+                            // Color logic
+                            isCurrent && "text-[#98EB94]",
                             isPast && "text-white",
-                            isFuture && "text-[#787880] opacity-20"
+                            isFuture && "text-[#787880] opacity-20",
+
+                            // Variant overrides
+                            stage.variant === 'small' && "!text-white" // Always white text on gold bg
                         )}
+                        style={stage.variant === 'small' ? { fontVariationSettings: "'FILL' 1" } : undefined}
                     >
                         {stage.icon}
                     </span>
