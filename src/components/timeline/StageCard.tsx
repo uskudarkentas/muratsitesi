@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getCardClassName, getStageDescription } from "@/lib/stageHelpers";
 import { Stage } from "@/lib/stages";
+import { DynamicStageCard } from "@/components/DynamicStageCard";
 
 interface StageCardProps {
     stage: Stage;
@@ -44,18 +45,42 @@ export function StageCard({
                 </button>
             )}
 
-            <h3 className="text-xl font-bold mb-2 text-gray-700 dark:text-gray-300">
-                {stage.title}
-            </h3>
+            {/* Dynamic Content for Desktop */}
+            {variant === 'desktop' ? (
+                <DynamicStageCard key={stage.id} stageId={stage.id} />
+            ) : (
+                // Mobile View (Simple Summary)
+                <>
+                    <h3 className="text-xl font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        {stage.title}
+                    </h3>
 
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                {description}
-            </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
+                        {description}
+                    </p>
+                </>
+            )}
 
-            <div className="flex items-center justify-between">
+            {/* Actions / Buttons - Kept for both but logic might need adjustment if DynamicStageCard has its own */}
+            {/* DynamicStageCard handles its own content. But maybe we keep the link button for "Details"? */}
+            {/* User request: "Content Panel" (Desktop) should use fetch logic. 
+                DynamicStageCard renders Title + Date + RichText. 
+                So for desktop, we might NOT want the original Title/Description/Button layout exactly as before.
+                Current implementation of DynamicStageCard includes Title and Date.
+                
+                However, for the Detail Link ("Detayları Gör"), it is still relevant.
+                I will append the "Detayları Gör" button BELOW the DynamicStageCard content if desktop.
+            */}
+
+            <div className="flex items-center justify-between mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
+                {/* Share Button Logic - Mobile mostly, Desktop has it in rich text? 
+                     User said: "For Images: Add share". But main card sharing is good too.
+                 */}
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-400">22/01/2026</span>
-                    {isCurrent && (
+                    {!isCurrent && variant === 'desktop' && (
+                        <span className="text-xs text-gray-400">Daha eski duyurular için detaya gidiniz</span>
+                    )}
+                    {isCurrent && variant === 'mobile' && (
                         <button
                             onClick={() => onShare(stage)}
                             className="text-gray-400 hover:text-[#98EB94] transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -71,8 +96,6 @@ export function StageCard({
                     href={`/asamalar/${stage.slug}`}
                     className={cn(
                         "px-8 py-3 rounded-lg text-sm font-semibold transition-colors",
-                        // Logic from original: isCurrent || isPast (desktop) OR logic for mobile
-                        // Mobile logic: STAGES[mobilePopupIndex].id === ACTIVE_STAGE_ID || mobilePopupIndex < activeStageIndex
                         (variant === 'mobile'
                             ? (isCurrent || (mobileIndex !== undefined && mobileIndex < activeStageIndex))
                             : (isCurrent || isPast)
@@ -91,7 +114,7 @@ export function StageCard({
                         const allow = variant === 'mobile'
                             ? (isCurrent || (mobileIndex !== undefined && mobileIndex < activeStageIndex))
                             : (isCurrent || isPast);
-                        return allow ? "Detayları Gör" : (variant === 'mobile' ? "Kilitli" : "Henüz Aktif Değil");
+                        return allow ? "Tüm Detayları Gör" : (variant === 'mobile' ? "Kilitli" : "Henüz Aktif Değil");
                     })()}
                 </Link>
             </div>

@@ -2,10 +2,12 @@
 import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
 import Footer from "@/components/Footer";
+import { TimelineProvider } from "@/context/TimelineContext";
+import { ProjectSummarySidebar } from "@/components/ProjectSummarySidebar";
 
 export default function Home() {
   return (
-    <>
+    <TimelineProvider>
       <main className="flex h-screen flex-col bg-background relative overflow-hidden">
         {/* Noise texture overlay */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-0"
@@ -19,52 +21,7 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
 
           {/* Project Summary - Fixed Left relative to Scroll Container */}
-          <aside className="hidden lg:block absolute left-4 top-6 w-64 z-20">
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 text-left">
-              <h3 className="text-lg font-bold text-[#46474A] mb-4 text-left">Proje Özeti</h3>
-              <div className="space-y-3 text-sm text-left">
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Proje Adı</p>
-                  <p className="font-semibold text-gray-700 dark:text-gray-300">Murat Sitesi</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Toplam Aşama</p>
-                  <p className="font-semibold text-gray-700 dark:text-gray-300">11 Aşama</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Aktif Aşama</p>
-                  <p className="font-semibold text-[#98EB94]">Riskli Yapı İlanı</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">İlerleme</p>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mt-2">
-                    <div className="bg-[#98EB94] h-3 rounded-full" style={{ width: '54%' }}></div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">6/11 Tamamlandı</p>
-                </div>
-
-                {/* Horizontal Divider */}
-                <div className="border-t border-gray-100 dark:border-gray-700 my-4"></div>
-
-                {/* Project Imprint */}
-                <h4 className="text-sm font-bold text-[#46474A] mb-3">Proje Künyesi</h4>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1">Blok Sayısı</p>
-                    <p className="font-semibold text-gray-700 dark:text-gray-300">11 Blok</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1">Toplam İnşaat Alanı</p>
-                    <p className="font-semibold text-gray-700 dark:text-gray-300">154.000 m²</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1">Bağımsız Birim Sayısı</p>
-                    <p className="font-semibold text-gray-700 dark:text-gray-300">450 Konut</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
+          <ProjectSummarySidebar />
 
           <div className="w-full max-w-screen-2xl mx-auto relative h-full">
 
@@ -85,6 +42,6 @@ export default function Home() {
         </div>
         <Footer />
       </main >
-    </>
+    </TimelineProvider>
   );
 }

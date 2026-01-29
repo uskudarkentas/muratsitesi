@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import { useTimelineContext } from "@/context/TimelineContext";
 import { STAGES } from "@/lib/stages";
 import { TIMELINE_CONSTANTS } from "@/lib/constants";
 import { useTimelineScroll } from "@/hooks/useTimelineScroll";
@@ -18,6 +19,16 @@ export default function Timeline() {
     const [mobilePopupIndex, setMobilePopupIndex] = useState<number | null>(null);
 
     const activeStageIndex = STAGES.findIndex((s) => s.id === TIMELINE_CONSTANTS.ACTIVE_STAGE_ID);
+
+    // Context for Sidebar/Content sync
+    const { setFocusedStageId } = useTimelineContext();
+
+    // Sync focused stage ID to context
+    useEffect(() => {
+        if (STAGES[focusedIndex]) {
+            setFocusedStageId(STAGES[focusedIndex].id);
+        }
+    }, [focusedIndex, setFocusedStageId]);
 
     // 2-1-2 Stepper Window Logic
     const { visibleStart, visibleEnd } = useStepperWindow(focusedIndex, STAGES.length);
