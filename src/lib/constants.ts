@@ -1,6 +1,10 @@
 export const TIMELINE_CONSTANTS = {
-    ITEM_HEIGHT: 128,           // px - h-32 Tailwind class
-    CONTAINER_HEIGHT: 640,      // px - Total visible height (5 items * 128px)
-    PADDING_VERTICAL: 256,      // px - Top/Bottom padding to center active item (2 items * 128px)
-    ACTIVE_STAGE_ID: 7,         // Riskli Yapı İlanı
+    // Responsive item heights (in vh) based on visible count
+    ITEM_HEIGHT_VH: 20,           // Base: 20vh for 2-1-2 (5 items)
+    CONTAINER_HEIGHT_VH: 70,      // 70vh visible area
+    ACTIVE_STAGE_ID: 7,           // Riskli Yapı İlanı
+
+    // Visibility configuration for 2-1-2 pattern
+    MIN_BEFORE: 2,                // Minimum completed steps visible
+    MIN_AFTER: 2,                 // Minimum upcoming steps visible
 } as const;

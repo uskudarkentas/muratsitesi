@@ -100,7 +100,7 @@ export function getLatestAnnouncement(stageId: number): Announcement | null {
     if (announcements.length === 0) return null;
 
     // Sort by publishedAt descending and return first
-    return announcements.sort((a, b) =>
+    return announcements.slice().sort((a, b) =>
         b.publishedAt.getTime() - a.publishedAt.getTime()
     )[0];
 }

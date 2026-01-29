@@ -5,11 +5,17 @@ import { TIMELINE_CONSTANTS } from "@/lib/constants";
 export function useTimelineScroll(containerRef: RefObject<HTMLDivElement | null>) {
     const [focusedIndex, setFocusedIndex] = useState(0);
 
+    const getItemHeightPx = () => {
+        if (typeof window === 'undefined') return 128; // Fallback
+        return window.innerHeight * (TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 100);
+    };
+
     const handleScroll = () => {
         if (!containerRef.current) return;
         const container = containerRef.current;
         const { scrollTop } = container;
-        const calculatedIndex = Math.round(scrollTop / TIMELINE_CONSTANTS.ITEM_HEIGHT);
+        const itemHeight = getItemHeightPx();
+        const calculatedIndex = Math.round(scrollTop / itemHeight);
         const index = Math.max(0, Math.min(STAGES.length - 1, calculatedIndex));
         setFocusedIndex(index);
     };
@@ -21,8 +27,9 @@ export function useTimelineScroll(containerRef: RefObject<HTMLDivElement | null>
             if (activeStageIndex !== -1) {
                 // Small timeout to ensure DOM is ready and layout is stable
                 setTimeout(() => {
+                    const itemHeight = getItemHeightPx();
                     containerRef.current?.scrollTo({
-                        top: activeStageIndex * TIMELINE_CONSTANTS.ITEM_HEIGHT,
+                        top: activeStageIndex * itemHeight,
                         behavior: "instant",
                     });
                     setFocusedIndex(activeStageIndex);
@@ -31,5 +38,15 @@ export function useTimelineScroll(containerRef: RefObject<HTMLDivElement | null>
         }
     }, [containerRef]);
 
-    return { focusedIndex, handleScroll };
+    const scrollToIndex = (index: number) => {
+        if (containerRef.current) {
+            const itemHeight = getItemHeightPx();
+            containerRef.current.scrollTo({
+                top: index * itemHeight,
+                behavior: "smooth",
+            });
+        }
+    };
+
+    return { focusedIndex, handleScroll, scrollToIndex };
 }

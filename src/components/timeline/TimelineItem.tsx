@@ -14,7 +14,10 @@ interface TimelineItemProps {
     activeStageIndex: number;
     onShare: (stage: any) => void;
     onMobileClick: (index: number) => void;
-    containerRef: React.RefObject<HTMLDivElement | null>;
+    onScrollTo: () => void;
+    // 2-1-2 Window props
+    isVisible?: boolean;           // Is within visible window
+    distanceFromActive?: number;   // Distance from active step (for depth)
 }
 
 export function TimelineItem({
@@ -27,12 +30,34 @@ export function TimelineItem({
     activeStageIndex,
     onShare,
     onMobileClick,
-    containerRef
+    onScrollTo,
+    isVisible = true,
+    distanceFromActive = 0
 }: TimelineItemProps) {
+    // Calculate depth-based scale and opacity (2-1-2 pattern)
+    const getDepthScale = () => {
+        if (!isVisible) return 0.3;
+        if (isFocused) return 1;
+        const absDistance = Math.abs(distanceFromActive);
+        return Math.max(0.6, 1 - (absDistance * 0.15)); // Reduce scale by 15% per step
+    };
+
+    const getDepthOpacity = () => {
+        if (!isVisible) return 0;
+        if (isFocused) return 1;
+        const absDistance = Math.abs(distanceFromActive);
+        return Math.max(0.3, 1 - (absDistance * 0.2)); // Reduce opacity by 20% per step
+    };
+
     return (
         <motion.div
             className={`w-full flex justify-center items-center snap-center relative`}
-            style={{ height: TIMELINE_CONSTANTS.ITEM_HEIGHT }}
+            style={{ height: `${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH}dvh` }}
+            animate={{
+                scale: getDepthScale(),
+                opacity: getDepthOpacity(),
+            }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
         >
             {/* Left Side Label */}
             <motion.div
@@ -103,10 +128,7 @@ export function TimelineItem({
                     if (window.innerWidth < 768) {
                         onMobileClick(index);
                     } else {
-                        containerRef.current?.scrollTo({
-                            top: index * TIMELINE_CONSTANTS.ITEM_HEIGHT,
-                            behavior: "smooth",
-                        });
+                        onScrollTo();
                     }
                 }}
             >
@@ -147,7 +169,7 @@ export function TimelineItem({
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute left-[55%] pl-8 hidden md:block w-[450px]"
+                    className="absolute left-[55%] pl-8 hidden md:block w-[clamp(300px,35vw,450px)]"
                 >
                     <StageCard
                         stage={stage}
