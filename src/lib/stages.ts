@@ -1,5 +1,12 @@
 // Shared stage data with slug mapping
-export const STAGES = [
+export interface Stage {
+    id: number;
+    title: string;
+    icon: string;
+    slug: string;
+}
+
+export const STAGES: Stage[] = [
     { id: 1, title: "Başvuru", icon: "folder_open", slug: "basvuru" },
     { id: 2, title: "Ön Teklif", icon: "upload_file", slug: "on-teklif" },
     { id: 3, title: "Kesin Teklif", icon: "check_box", slug: "kesin-teklif" },
