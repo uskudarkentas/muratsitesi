@@ -1,6 +1,10 @@
 import { PrismaClient, StageStatus, PostType } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
     console.log('🌱 Starting database seed...');
@@ -11,7 +15,7 @@ async function main() {
     await prisma.post.deleteMany();
     await prisma.stage.deleteMany();
 
-    // 1. Create Stages
+    // 1. Create Stages (All 12 stages matching stages.ts)
     const stagesData = [
         {
             title: "Başvuru",
@@ -27,7 +31,7 @@ async function main() {
             description: "Ön teklif çalışmaları hazırlandı ve sunuldu.",
             status: StageStatus.COMPLETED,
             sequenceOrder: 2.0,
-            iconKey: "description"
+            iconKey: "upload_file"
         },
         {
             title: "Kesin Teklif",
@@ -35,7 +39,7 @@ async function main() {
             description: "Kesin teklifler belirlendi ve onaylandı.",
             status: StageStatus.COMPLETED,
             sequenceOrder: 3.0,
-            iconKey: "check_circle"
+            iconKey: "check_box"
         },
         {
             title: "Uzlaşma Görüşmeleri",
@@ -43,18 +47,18 @@ async function main() {
             description: "Hak sahipleri ile uzlaşma sağlandı.",
             status: StageStatus.COMPLETED,
             sequenceOrder: 4.0,
-            iconKey: "handshake"
+            iconKey: "groups"
         },
         {
-            title: "Temsil Sözleşmesi",
-            slug: "temsil-sozlesmesi",
+            title: "Temsili Sözleşme",
+            slug: "temsili-sozlesme",
             description: "Temsilciler heyeti ile sözleşme imzalandı.",
             status: StageStatus.COMPLETED,
             sequenceOrder: 5.0,
-            iconKey: "star" // User requested Star specifically for Temsili Sozlesme logic in UI
+            iconKey: "star"
         },
         {
-            title: "Karot Alımı ve Teknik Analiz",
+            title: "Karot Alımı",
             slug: "karot-alimi",
             description: "Binalardan karot örnekleri alındı ve analiz edildi.",
             status: StageStatus.COMPLETED,
@@ -65,17 +69,49 @@ async function main() {
             title: "Riskli Yapı İlanı",
             slug: "riskli-yapi-ilani",
             description: "Yapıların riskli olduğu resmen ilan edildi.",
-            status: StageStatus.ACTIVE, // MAIN FOCUS
+            status: StageStatus.ACTIVE,
             sequenceOrder: 7.0,
-            iconKey: "warning"
+            iconKey: "apartment"
         },
         {
-            title: "Tahliye ve Yıkım Süreci",
-            slug: "tahliye-yikim",
-            description: "Binaların tahliyesi ve yıkım işlemlerine başlanacak.",
+            title: "Sözleşme",
+            slug: "sozlesme",
+            description: "Müteahhit ile ana sözleşme imzalanacak.",
             status: StageStatus.LOCKED,
             sequenceOrder: 8.0,
+            iconKey: "signature"
+        },
+        {
+            title: "Tahliye Süreci",
+            slug: "tahliye-sureci",
+            description: "Binaların tahliye süreci başlayacak.",
+            status: StageStatus.LOCKED,
+            sequenceOrder: 9.0,
+            iconKey: "moving"
+        },
+        {
+            title: "Ruhsat Alımı",
+            slug: "ruhsat-alimi",
+            description: "İnşaat ruhsatı başvurusu yapılacak.",
+            status: StageStatus.LOCKED,
+            sequenceOrder: 10.0,
+            iconKey: "article"
+        },
+        {
+            title: "Yıkım Süreci",
+            slug: "yikim-sureci",
+            description: "Binaların yıkım işlemleri gerçekleştirilecek.",
+            status: StageStatus.LOCKED,
+            sequenceOrder: 11.0,
             iconKey: "domain_disabled"
+        },
+        {
+            title: "Anahtar Teslim",
+            slug: "anahtar-teslim",
+            description: "Yeni dairelerin teslimi yapılacak.",
+            status: StageStatus.LOCKED,
+            sequenceOrder: 12.0,
+            iconKey: "key"
         }
     ];
 

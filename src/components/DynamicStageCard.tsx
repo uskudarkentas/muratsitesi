@@ -67,8 +67,13 @@ export function DynamicStageCard({ stageId }: { stageId: number }) {
 
     if (!post) {
         return (
-            <div className="text-center py-8">
-                <p className="text-gray-500 dark:text-gray-400">Bu aşama hakkında henüz güncel bir duyuru bulunmamaktadır.</p>
+            <div className="text-left py-8">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                    Duyuru Bulunmuyor
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                    Bu aşama hakkında henüz güncel bir duyuru bulunmamaktadır.
+                </p>
             </div>
         );
     }

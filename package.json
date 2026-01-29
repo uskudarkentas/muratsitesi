@@ -12,6 +12,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@prisma/config": "^7.3.0",
     "@shadcn/ui": "^0.0.4",
@@ -23,6 +24,7 @@
     "lucide-react": "^0.563.0",
     "next": "16.1.5",
     "next-auth": "^5.0.0-beta.30",
+    "pg": "^8.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0"

@@ -36,7 +36,7 @@ export async function getFutureEvents(stageId: number) {
                     in: ["MEETING", "SURVEY"],
                 },
                 eventDate: {
-                    gt: new Date(), // Only future events
+                    gte: new Date(new Date().setHours(0, 0, 0, 0)), // Include today until midnight
                 },
             },
             orderBy: {

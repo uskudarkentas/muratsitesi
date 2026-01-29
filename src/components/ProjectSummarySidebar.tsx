@@ -29,22 +29,18 @@ export function ProjectSummarySidebar() {
     const completedCount = activeStageId - 1;
     const progressPercentage = (completedCount / STAGES.length) * 100;
 
-    // Fetch future events when focused stage changes
+    // Fetch future events for the ACTIVE STAGE (Global Project Context)
+    // We do not depend on focusedStageId here, so scrolling does not hide the event.
     useEffect(() => {
-        // Only fetch if focused stage is relevant or general project summary should update?
-        // User requirement: "If there is a future meeting ... for the focused stage ... display it".
-
-        // We use focusedStageId from context
-        // Debounce?
-        const timer = setTimeout(async () => {
-            if (focusedStageId) {
-                const event = await getFutureEvents(focusedStageId);
+        async function fetchEvents() {
+            const targetId = TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
+            if (targetId) {
+                const event = await getFutureEvents(targetId);
                 setFutureEvent(event as any);
             }
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [focusedStageId]);
+        }
+        fetchEvents();
+    }, []);
 
     return (
         <aside className="hidden lg:block absolute left-4 top-6 w-64 z-20">
