@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  RESIDENT
+}
+
+enum StageStatus {
+  LOCKED
+  ACTIVE
+  COMPLETED
+}
+
+enum PostType {
+  ANNOUNCEMENT
+  MEETING
+  SURVEY
+}
+
+enum ActionType {
+  LOGIN
+  VIEW_POST
+  VOTE
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          Role      @default(RESIDENT)
+  fullName      String    @map("full_name")
+  apartmentInfo String?   @map("apartment_info") // Blok/Daire No
+  lastLogin     DateTime? @map("last_login")
+  
+  votes         SurveyVote[]
+  analytics     AnalyticsLog[]
+
+  @@map("users")
+}
+
+model Stage {
+  id            Int         @id @default(autoincrement())
+  title         String
+  slug          String      @unique
+  description   String?
+  status        StageStatus @default(LOCKED)
+  sequenceOrder Float       @map("sequence_order") // 1.0, 1.5, 2.0
+  isVisible     Boolean     @default(true) @map("is_visible")
+  iconKey       String      @map("icon_key")
+  
+  posts         Post[]
+
+  @@map("stages")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  stageId     Int      @map("stage_id")
+  type        PostType
+  title       String
+  content     Json?    // Editor.js output
+  isPublished Boolean  @default(false) @map("is_published")
+  publishedAt DateTime? @map("published_at")
+  eventDate   DateTime? @map("event_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  stage       Stage    @relation(fields: [stageId], references: [id])
+  votes       SurveyVote[]
+
+  @@map("posts")
+}
+
+model SurveyVote {
+  id             String   @id @default(uuid())
+  postId         String   @map("post_id")
+  userId         String   @map("user_id")
+  optionSelected String   @map("option_selected") // Or JSON if multiple choice
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  post           Post     @relation(fields: [postId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("survey_votes")
+}
+
+model AnalyticsLog {
+  id        String     @id @default(uuid())
+  userId    String?    @map("user_id") // Nullable if tracking guests (though context says private)
+  action    ActionType
+  targetId  String?    @map("target_id") // Post ID or Stage ID
+  ipAddress String?    @map("ip_address")
+  timestamp DateTime   @default(now())
+
+  user      User?      @relation(fields: [userId], references: [id])
+
+  @@map("analytics_logs")
+}

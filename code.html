@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Murat Sitesi Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ed2630",
+                        "background-light": "#fcfcfc",
+                        "background-dark": "#221011",
+                        "success": "#15803d",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .timeline-line {
+            position: absolute;
+            left: 50%; 
+            transform: translateX(-50%);
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+        .dark .timeline-line {
+            background-color: #374151;
+        }
+        .popout-connector {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            background-color: #d1d5db;
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+        .popout-connector::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#1b0d0e] dark:text-white min-h-screen flex flex-col overflow-hidden">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f3e7e8] dark:border-zinc-800 bg-white dark:bg-[#221011] px-6 lg:px-12 py-5 shadow-sm z-30 relative">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 border-r border-gray-200 dark:border-gray-700 pr-6 mr-2">
+<div class="size-10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined !text-4xl">location_city</span>
+</div>
+<div class="flex flex-col leading-tight">
+<span class="text-xs font-bold text-gray-500 uppercase">Üsküdar</span>
+<span class="text-sm font-bold">Belediyesi</span>
+</div>
+</div>
+<div class="flex items-center gap-3 text-[#1b0d0e] dark:text-white">
+<div class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined !text-3xl">apartment</span>
+</div>
+<h2 class="text-[#1b0d0e] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Murat Sitesi</h2>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<nav class="hidden md:flex gap-8 text-lg font-medium">
+<a class="text-primary font-bold" href="#">Aşamalar</a>
+<a class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors" href="#">Duyurular</a>
+<a class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors" href="#">İletişim</a>
+</nav>
+<button aria-label="Profile" class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-full hover:bg-red-50 dark:hover:bg-zinc-800 text-[#1b0d0e] dark:text-white transition-colors">
+<span class="material-symbols-outlined !text-3xl">person</span>
+</button>
+</div>
+</header>
+<main class="flex-1 w-full h-full relative overflow-y-auto overflow-x-hidden flex justify-center py-20">
+<div class="relative w-full max-w-7xl mx-auto flex justify-center items-start min-h-[800px]">
+<div class="timeline-line"></div>
+<div class="flex flex-col items-center gap-16 relative z-10 w-full">
+<div class="flex items-center justify-center w-full relative">
+<div class="absolute right-[52%] pr-8 text-right hidden md:block">
+<span class="text-2xl font-semibold text-primary/80 dark:text-white/80">Başvuru</span>
+</div>
+<div class="relative flex items-center justify-center size-16 rounded-full bg-primary/90 text-white shadow-lg transition-transform hover:scale-105 cursor-pointer">
+<span class="material-symbols-outlined !text-3xl">folder_open</span>
+</div>
+</div>
+<div class="flex items-center justify-center w-full relative">
+<div class="absolute right-[52%] pr-8 text-right hidden md:block">
+<span class="text-2xl font-semibold text-primary/80 dark:text-white/80">Ön Teklif</span>
+</div>
+<div class="relative flex items-center justify-center size-16 rounded-full bg-primary/90 text-white shadow-lg transition-transform hover:scale-105 cursor-pointer">
+<span class="material-symbols-outlined !text-3xl">upload_file</span>
+</div>
+</div>
+<div class="flex items-center justify-center w-full relative py-6">
+<div class="absolute right-[52%] pr-12 text-right hidden md:block w-64">
+<h2 class="text-3xl font-extrabold text-[#78181c] dark:text-red-400">Kesin Teklif</h2>
+</div>
+<div class="relative z-20">
+<div class="popout-connector hidden md:block"></div>
+<div class="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
+<div class="absolute -inset-2 rounded-full border-4 border-primary/30"></div>
+<div class="relative flex items-center justify-center size-24 rounded-full bg-white dark:bg-[#221011] border-[4px] border-primary text-primary shadow-[0_0_30px_rgba(237,38,48,0.3)] z-20 scale-110">
+<span class="material-symbols-outlined !text-5xl">check_box</span>
+</div>
+</div>
+<div class="absolute left-[52%] pl-16 hidden md:block w-[500px]">
+<div class="bg-white dark:bg-[#1a0b0c] border border-red-100 dark:border-red-900/30 rounded-2xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative">
+<div class="flex flex-col gap-4">
+<h3 class="text-2xl font-bold text-gray-900 dark:text-white">Kesin Teklif Süreci</h3>
+<p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                                    Belediye tarafından hazırlanan kesin teklifler hak sahiplerine sunulmaktadır. İnceleme sonrası onay sürecine geçilecektir. Lütfen belgelerinizi kontrol ediniz.
+                                </p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-gray-400 font-medium">22/01/2026</span>
+<button class="bg-success hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg">
+                                        Daha Fazla
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<div class="md:hidden mt-32 absolute w-full px-6">
+<div class="bg-white dark:bg-[#1a0b0c] border border-red-100 dark:border-red-900/30 rounded-2xl p-6 shadow-xl text-center">
+<h2 class="text-2xl font-bold text-primary mb-2">Kesin Teklif</h2>
+<p class="text-gray-600 dark:text-gray-300 mb-4">Belediye tarafından hazırlanan kesin teklifler hak sahiplerine sunulmaktadır.</p>
+<button class="w-full bg-success text-white py-3 rounded-lg font-bold">İncele</button>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center w-full relative opacity-40">
+<div class="absolute right-[52%] pr-8 text-right hidden md:block">
+<span class="text-2xl font-semibold text-gray-400 dark:text-gray-500">Uzlaşma Görüşmeleri</span>
+</div>
+<div class="relative flex items-center justify-center size-16 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined !text-3xl">groups</span>
+</div>
+</div>
+<div class="flex items-center justify-center w-full relative opacity-40">
+<div class="absolute right-[52%] pr-8 text-right hidden md:block">
+<span class="text-2xl font-semibold text-gray-400 dark:text-gray-500">Sözleşme</span>
+</div>
+<div class="relative flex items-center justify-center size-16 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined !text-3xl">signature</span>
+</div>
+</div>
+<div class="flex items-center justify-center w-full relative opacity-40">
+<div class="absolute right-[52%] pr-8 text-right hidden md:block">
+<span class="text-2xl font-semibold text-gray-400 dark:text-gray-500">Karot Alımı</span>
+</div>
+<div class="relative flex items-center justify-center size-16 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined !text-3xl">home_work</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
