@@ -52,8 +52,8 @@ export default function Timeline() {
                     className="relative z-10 w-full overflow-y-auto no-scrollbar snap-y snap-mandatory"
                     style={{
                         height: `${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH}dvh`,
-                        paddingTop: `calc(50dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`, // Center active item
-                        paddingBottom: `calc(50dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`,
+                        paddingTop: `calc(${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH / 2}dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`, // Center in container
+                        paddingBottom: `calc(${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH / 2}dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`,
                         scrollbarWidth: "none",
                         msOverflowStyle: "none"
                     }}

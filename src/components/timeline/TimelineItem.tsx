@@ -67,52 +67,79 @@ export function TimelineItem({
                 }}
                 className={cn(
                     "absolute transition-all duration-300",
-                    "left-2 md:right-[55%] md:left-auto",
-                    "text-left md:text-right md:pr-8",
-                    "max-w-[35%] md:max-w-none",
+                    "hidden md:block", // Hide on mobile, show only center icon + modal
+                    "right-1/2 mr-24", // Fixed offset from center (matches card spacing)
+                    "text-right",
+                    "w-[clamp(200px,30vw,350px)]",
                     isCurrent && "font-bold",
                     isPast && "text-gray-500",
                     isFuture && "text-gray-300"
                 )}
             >
+                <div className="flex flex-col items-end">
+                    <span className={cn(
+                        getStageInputClassName(isFocused),
+                        isCurrent && "text-[#98EB94]"
+                    )}>
+                        {stage.title}
+                    </span>
+
+                    {isPast && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-1 justify-end text-[#98EB94] text-sm mt-1 font-bold"
+                        >
+                            <span>Tamamlandı</span>
+                            <span className="material-symbols-outlined !text-sm">check</span>
+                        </motion.div>
+                    )}
+                    {isCurrent && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-1 justify-end text-[#98EB94] text-xs mt-1 font-medium"
+                        >
+                            <span>Süreç Devam Ediyor</span>
+                            <span className="material-symbols-outlined !text-sm animate-spin">sync</span>
+                        </motion.div>
+                    )}
+                    {isFuture && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-1 justify-end text-gray-400 text-xs mt-1 font-medium"
+                        >
+                            <span>Sürece Başlanmadı</span>
+                            <span className="material-symbols-outlined !text-sm">lock</span>
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
+
+            {/* Mobile Title & Status - Side positioned (Left side like Desktop) */}
+            <div className="md:hidden absolute right-1/2 mr-24 min-w-[140px] text-right pointer-events-none flex flex-col items-end gap-1 z-30">
                 <span className={cn(
-                    getStageInputClassName(isFocused),
-                    isCurrent && "text-[#98EB94]"
+                    "text-sm font-bold block leading-tight",
+                    isCurrent ? "text-[#98EB94]" : "text-gray-600 dark:text-gray-300"
                 )}>
                     {stage.title}
                 </span>
 
+                {/* Mobile Status Badge */}
                 {isPast && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center gap-1 justify-start md:justify-end text-[#98EB94] text-xs md:text-sm mt-1 font-bold"
-                    >
-                        <span>Tamamlandı</span>
-                        <span className="material-symbols-outlined !text-sm">check</span>
-                    </motion.div>
+                    <span className="text-[10px] font-bold text-[#98EB94] flex items-center gap-1">
+                        Tamamlandı
+                        <span className="material-symbols-outlined !text-[12px]">check</span>
+                    </span>
                 )}
                 {isCurrent && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center gap-1 justify-start md:justify-end text-[#98EB94] text-[10px] md:text-xs mt-1 font-medium"
-                    >
-                        <span>Süreç Devam Ediyor</span>
-                        <span className="material-symbols-outlined !text-sm animate-spin">sync</span>
-                    </motion.div>
+                    <span className="text-[10px] font-bold text-[#98EB94] flex items-center gap-1">
+                        Süreç Devam Ediyor
+                        <span className="material-symbols-outlined !text-[12px] animate-spin">sync</span>
+                    </span>
                 )}
-                {isFuture && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex items-center gap-1 justify-start md:justify-end text-gray-400 text-[10px] md:text-xs mt-1 font-medium"
-                    >
-                        <span>Sürece Başlanmadı</span>
-                        <span className="material-symbols-outlined !text-sm">lock</span>
-                    </motion.div>
-                )}
-            </motion.div>
+            </div>
 
             {/* Center Icon Circle */}
             <motion.div
@@ -121,8 +148,7 @@ export function TimelineItem({
                 }}
                 className={cn(
                     "relative flex items-center justify-center rounded-full z-20 transition-all duration-300 cursor-pointer",
-                    isCurrent && "size-20",
-                    !isCurrent && "size-16"
+                    isCurrent ? "size-20" : "size-16"
                 )}
                 onClick={() => {
                     if (window.innerWidth < 768) {
@@ -169,8 +195,11 @@ export function TimelineItem({
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="absolute left-[55%] pl-8 hidden md:block w-[clamp(300px,35vw,450px)]"
+                    className="absolute left-1/2 ml-24 hidden md:block w-[clamp(300px,35vw,450px)]"
                 >
+                    {/* Connector Line to Card */}
+                    <div className="absolute -left-24 top-1/2 w-24 h-[2px] bg-gray-200 dark:bg-gray-700 -translate-y-1/2 pointer-events-none -z-10"></div>
+
                     <StageCard
                         stage={stage}
                         isCurrent={isCurrent}

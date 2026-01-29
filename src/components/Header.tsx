@@ -12,7 +12,7 @@ export default function Header() {
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-border bg-card px-6 lg:px-12 py-2 shadow-sm z-30 relative sticky top-0 pt-[env(safe-area-inset-top)]">
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="relative h-16 md:h-20 w-full md:w-[500px] max-w-full">
+                    <div className="relative h-12 w-[180px] md:h-12 md:w-[300px] max-w-full">
                         <Image
                             src="/header-logo-final.png"
                             alt="Üsküdar Belediyesi - Kentaş - Üsküdar Yenileniyor"

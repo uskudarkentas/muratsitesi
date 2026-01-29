@@ -96,13 +96,8 @@ export function StageCard({
                 </Link>
             </div>
 
-            {/* Desktop Connectors */}
-            {variant === 'desktop' && (
-                <>
-                    <div className="absolute -left-8 top-1/2 w-8 h-[2px] bg-gray-200 dark:bg-gray-700 -translate-y-1/2"></div>
-                    <div className="absolute -left-1 top-1/2 size-2 bg-gray-300 dark:bg-gray-600 rounded-full -translate-y-1/2"></div>
-                </>
-            )}
+            {/* Desktop Connectors - Removed as handled in TimelineItem */}
+            {variant === 'desktop' && null}
         </div>
     );
 }
