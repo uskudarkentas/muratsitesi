@@ -4,10 +4,21 @@ import Timeline from "@/components/Timeline";
 import Footer from "@/components/Footer";
 import { TimelineProvider } from "@/context/TimelineContext";
 import { ProjectSummarySidebar } from "@/components/ProjectSummarySidebar";
+import { db } from "@/lib/db";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
-export default function Home() {
+// Force dynamic rendering since we are fetching data
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  // Fetch stages from database
+  const stages = await db.stage.findMany({
+    orderBy: { sequenceOrder: 'asc' },
+  });
+
   return (
     <TimelineProvider>
+      <PageViewTracker />
       <main className="flex h-screen flex-col bg-background relative overflow-hidden">
         {/* Noise texture overlay */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-0"
@@ -36,7 +47,8 @@ export default function Home() {
               <h1 className="text-xl md:text-2xl font-bold text-[#46474A] mb-8 md:mb-12 text-center px-4 md:px-0 relative z-10 max-w-xl leading-tight">
                 Murat Sitesi <br className="md:hidden" /> Kentsel Dönüşüm Süreci
               </h1>
-              <Timeline />
+              {/* @ts-ignore - DB type vs Component type slight mismatch on icon vs iconKey */}
+              <Timeline stages={stages as any} />
             </div>
           </div>
         </div>

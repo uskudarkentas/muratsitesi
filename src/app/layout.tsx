@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Public_Sans } from "next/font/google"; // Changed from Geist
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const publicSans = Public_Sans({
-  variable: "--font-public-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -25,7 +25,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body
-        className={`${publicSans.variable} antialiased bg-background-light dark:bg-background-dark font-display text-[#1b0d0e] dark:text-white min-h-screen flex flex-col overflow-hidden`}
+        className={`${inter.variable} font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col overflow-hidden`}
       >
         {children}
       </body>

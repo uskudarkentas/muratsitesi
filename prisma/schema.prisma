@@ -30,6 +30,8 @@ enum ActionType {
   LOGIN
   VIEW_POST
   VOTE
+  PAGE_VIEW      // Track page/route visits
+  SHARE          // Track share button clicks
 }
 
 model User {
@@ -56,6 +58,7 @@ model Stage {
   sequenceOrder Float       @map("sequence_order") // 1.0, 1.5, 2.0
   isVisible     Boolean     @default(true) @map("is_visible")
   iconKey       String      @map("icon_key")
+  variant       String      @default("default") // default, small
   
   posts         Post[]
 

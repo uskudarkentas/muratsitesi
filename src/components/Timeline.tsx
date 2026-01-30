@@ -3,7 +3,8 @@
 import { useRef, useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useTimelineContext } from "@/context/TimelineContext";
-import { STAGES } from "@/lib/stages";
+
+
 import { TIMELINE_CONSTANTS } from "@/lib/constants";
 import { useTimelineScroll } from "@/hooks/useTimelineScroll";
 import { useStepperWindow } from "@/hooks/useStepperWindow";
@@ -12,7 +13,26 @@ import { TimelineItem } from "@/components/timeline/TimelineItem";
 import { TimelineMobileModal } from "@/components/timeline/TimelineMobileModal";
 import { StepperControls } from "@/components/timeline/StepperControls";
 
-export default function Timeline() {
+// Define Stage interface matching DB/Prisma model roughly
+interface StageData {
+    id: number;
+    title: string;
+    description: string | null;
+    slug: string;
+    iconKey: string;
+    status: string;
+    sequenceOrder: number;
+    isVisible: boolean;
+    variant?: string;
+}
+
+interface TimelineProps {
+    stages: StageData[];
+}
+
+export default function Timeline({ stages }: TimelineProps) {
+    const STAGES = stages; // Map prop to local variable to minimize code changes
+
     const containerRef = useRef<HTMLDivElement>(null);
     const { focusedIndex, handleScroll, scrollToIndex } = useTimelineScroll(containerRef);
     const { handleShare } = useStageShare();

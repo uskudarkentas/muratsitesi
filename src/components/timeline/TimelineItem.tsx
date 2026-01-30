@@ -18,6 +18,8 @@ interface TimelineItemProps {
     // 2-1-2 Window props
     isVisible?: boolean;           // Is within visible window
     distanceFromActive?: number;   // Distance from active step (for depth)
+    isAdmin?: boolean;
+    onDelete?: () => void;
 }
 
 export function TimelineItem({
@@ -32,7 +34,9 @@ export function TimelineItem({
     onMobileClick,
     onScrollTo,
     isVisible = true,
-    distanceFromActive = 0
+    distanceFromActive = 0,
+    isAdmin = false,
+    onDelete,
 }: TimelineItemProps) {
     // Calculate depth-based scale and opacity (2-1-2 pattern)
     const getDepthScale = () => {
@@ -44,6 +48,7 @@ export function TimelineItem({
 
     const getDepthOpacity = () => {
         if (!isVisible) return 0;
+        if (isAdmin) return 1; // Admin mode: always visible
         if (isFocused) return 1;
         const absDistance = Math.abs(distanceFromActive);
         return Math.max(0.3, 1 - (absDistance * 0.2)); // Reduce opacity by 20% per step
@@ -154,10 +159,13 @@ export function TimelineItem({
                     scale: isCurrent && isFocused ? 1.5 : isFocused ? 1.2 : 1,
                 }}
                 className={cn(
-                    "relative flex items-center justify-center rounded-full z-20 transition-all duration-300 cursor-pointer",
+                    "relative flex items-center justify-center rounded-full z-20 transition-all duration-300 cursor-pointer group",
                     stage.variant === 'small'
                         ? (isCurrent ? "size-14" : "size-10") // Smaller sizes for 'small' variant (Temsili Sözleşme)
-                        : (isCurrent ? "size-20" : "size-16") // Standard sizes
+                        : (isCurrent ? "size-20" : "size-16"), // Standard sizes
+
+                    // Admin Future Visibility Override
+                    isAdmin && isFuture && "!bg-slate-200 !border-slate-400 !text-slate-600 border-2 border-dashed shadow-none"
                 )}
                 onClick={() => {
                     if (window.innerWidth < 768) {
@@ -167,6 +175,20 @@ export function TimelineItem({
                     }
                 }}
             >
+                {/* Admin Controls */}
+                {isAdmin && onDelete && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(); // Trigger parent handler (which opens modal)
+                        }}
+                        className="absolute -top-3 -right-3 z-[60] bg-red-500 text-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 hover:scale-110"
+                        title="Aşamayı Sil"
+                    >
+                        <span className="material-symbols-outlined !text-xl leading-none">delete</span>
+                    </button>
+                )}
+
                 {/* Glow effects for active */}
                 {isCurrent && (
                     <>
@@ -191,7 +213,7 @@ export function TimelineItem({
                         isFuture && "bg-[#F2F2F7] border-2 border-[#F2F2F7]",
 
                         // Overrides for 'small' variant (Temsili Sözleşme) - GOLD STYLE
-                        stage.variant === 'small' && "bg-[#FCD535] border-none shadow-sm", // Solid Yellow/Gold
+                        stage.variant === 'small' && "!bg-[#FCD535] !border-none !shadow-sm", // Solid Yellow/Gold
                         stage.variant === 'small' && isCurrent && "shadow-[0_0_20px_rgba(252,213,53,0.6)] scale-110" // Gold glow if active
                     )}
                 >
@@ -212,7 +234,7 @@ export function TimelineItem({
                         )}
                         style={stage.variant === 'small' ? { fontVariationSettings: "'FILL' 1" } : undefined}
                     >
-                        {stage.icon}
+                        {stage.icon || stage.iconKey}
                     </span>
                 </div>
             </motion.div>

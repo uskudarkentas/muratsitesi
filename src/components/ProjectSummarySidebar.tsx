@@ -43,7 +43,7 @@ export function ProjectSummarySidebar() {
     }, []);
 
     return (
-        <aside className="hidden lg:block absolute left-4 top-6 w-64 z-20">
+        <aside className="hidden lg:block absolute left-4 top-12 w-64 z-20">
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 text-left">
                 <h3 className="text-lg font-bold text-[#46474A] mb-4 text-left">Proje Özeti</h3>
                 <div className="space-y-3 text-sm text-left">

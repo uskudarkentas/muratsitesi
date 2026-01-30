@@ -1,4 +1,6 @@
 import { getLatestAnnouncement, getAnnouncementPreview } from "@/lib/mockData";
+import { trackAnalytics } from "@/actions/analytics";
+import { ActionType } from "@prisma/client";
 
 export function useStageShare() {
     const handleShare = async (stage: any) => {
@@ -19,6 +21,17 @@ export function useStageShare() {
             } else {
                 await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
                 alert("Bağlantı kopyalandı!");
+            }
+
+            // Track share analytics (non-blocking)
+            try {
+                await trackAnalytics({
+                    action: ActionType.SHARE,
+                    targetId: stage.id.toString(),
+                });
+            } catch (analyticsError) {
+                // Silently fail - analytics should not block user actions
+                console.warn('Failed to track share analytics:', analyticsError);
             }
         } catch (err) {
             console.error('Error sharing:', err);

@@ -1,27 +1,28 @@
 import { notFound } from "next/navigation";
-import { getStageBySlug, STAGES } from "@/lib/stages";
 import { getStagePosts } from "@/actions/timeline";
 import Header from "@/components/Header";
 import { RichTextRenderer } from "@/components/RichTextRenderer";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import { db } from "@/lib/db";
 
-export function generateStaticParams() {
-    return STAGES.map((stage) => ({
-        slug: stage.slug,
-    }));
-}
+// Force dynamic rendering to handle new stages immediately
+export const dynamic = "force-dynamic";
 
 export default async function StagePage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const stage = getStageBySlug(slug);
+
+    // Fetch stage from DB
+    const stage = await db.stage.findUnique({
+        where: { slug },
+    });
 
     if (!stage) {
         notFound();
     }
 
     // Fetch real posts from database
-    const posts = await getStagePosts(params.slug);
+    const posts = await getStagePosts(slug);
 
     return (
         <main className="flex min-h-screen flex-col bg-background pb-[env(safe-area-inset-bottom)]">
@@ -32,12 +33,12 @@ export default async function StagePage({ params }: { params: Promise<{ slug: st
                 <div className="flex items-center gap-4 mb-8">
                     <div className="size-16 rounded-full bg-card border-2 border-primary flex items-center justify-center">
                         <span className="material-symbols-outlined text-primary !text-4xl">
-                            {stage.icon}
+                            {stage.iconKey}
                         </span>
                     </div>
                     <div>
                         <h1 className="text-4xl font-bold text-foreground">{stage.title}</h1>
-                        <p className="text-muted-foreground mt-1">Aşama #{stage.id}</p>
+                        <p className="text-muted-foreground mt-1">Aşama #{stage.sequenceOrder}</p>
                     </div>
                 </div>
 
