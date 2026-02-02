@@ -190,8 +190,8 @@ export async function createPost(data: {
                 title: data.title,
                 content: JSON.stringify({ blocks: [{ type: "paragraph", data: { text: data.content } }] }),
                 type: "ANNOUNCEMENT",
-                imageUrl: data.imageUrl,
-                attachmentUrl: data.attachmentUrl,
+                imageUrl: data.imageUrl || null,
+                attachmentUrl: data.attachmentUrl || null,
             },
         });
 
@@ -202,7 +202,7 @@ export async function createPost(data: {
         return { success: true, post };
     } catch (error) {
         console.error("Error creating post:", error);
-        return { success: false, error: "Duyuru oluşturulamadı" };
+        return { success: false, error: error instanceof Error ? error.message : "Duyuru oluşturulamadı" };
     }
 }
 
