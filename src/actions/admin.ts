@@ -188,7 +188,8 @@ export async function createPost(data: {
             data: {
                 stageId: data.stageId,
                 title: data.title,
-                content: data.content,
+                content: JSON.stringify({ blocks: [{ type: "paragraph", data: { text: data.content } }] }),
+                type: "ANNOUNCEMENT",
                 imageUrl: data.imageUrl,
                 attachmentUrl: data.attachmentUrl,
             },

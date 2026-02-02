@@ -71,6 +71,8 @@ model Post {
   type        PostType
   title       String
   content     Json?    // Editor.js output
+  imageUrl    String?  @map("image_url")
+  attachmentUrl String? @map("attachment_url")
   isPublished Boolean  @default(false) @map("is_published")
   publishedAt DateTime? @map("published_at")
   eventDate   DateTime? @map("event_date")
