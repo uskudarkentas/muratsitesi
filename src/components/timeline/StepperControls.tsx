@@ -9,6 +9,7 @@ interface StepperControlsProps {
     onNext: () => void;
     onPrevious: () => void;
     onJumpTo: (index: number) => void;
+    className?: string; // Optional custom styling
 }
 
 export function StepperControls({
@@ -16,13 +17,14 @@ export function StepperControls({
     totalSteps,
     onNext,
     onPrevious,
-    onJumpTo
+    onJumpTo,
+    className = ""
 }: StepperControlsProps) {
     const canGoPrevious = currentStep > 0;
     const canGoNext = currentStep < totalSteps - 1;
 
     return (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 md:gap-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 md:gap-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-4 py-2 md:px-6 md:py-3 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 ${className}`}>
             {/* Previous Button */}
             <motion.button
                 onClick={onPrevious}

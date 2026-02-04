@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
-import { StagesDropdown } from "@/components/StagesDropdown";
+import { HeaderNav } from "@/components/HeaderNav";
 
 export default async function Header() {
     // Fetch stages dynamically from database
@@ -31,23 +31,7 @@ export default async function Header() {
                 </div>
             </div>
             <div className="flex items-center gap-8">
-                <nav className="hidden md:flex gap-8 text-lg font-medium">
-                    {/* Aşamalar Dropdown */}
-                    <StagesDropdown stages={stages} />
-
-                    <Link
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                        href="#"
-                    >
-                        Proje Planları
-                    </Link>
-                    <Link
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                        href="#"
-                    >
-                        İletişim
-                    </Link>
-                </nav>
+                <HeaderNav stages={stages} />
                 <Link
                     href="/admin/login"
                     aria-label="Kullanıcı Girişi"

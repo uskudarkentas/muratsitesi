@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar } from "@phosphor-icons/react";
+import { motion } from "framer-motion";
 
 interface MobilePreviewProps {
     title: string;
@@ -8,68 +8,128 @@ interface MobilePreviewProps {
 }
 
 export function MobilePreview({ title, content }: MobilePreviewProps) {
-    // Format today's date in Turkish format: "30 Ocak 2026"
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('tr-TR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
     return (
-        <div className="flex flex-col items-center justify-start h-full bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-8">
-            {/* Preview Header */}
-            <div className="text-center mb-6">
-                <p className="text-xs font-semibold tracking-tight text-slate-700 mb-1">
-                    Mobil Önizleme
-                </p>
-                <p className="text-xs text-slate-500">
-                    Kullanıcıların göreceği görünüm
-                </p>
+        <div className="sticky top-6">
+            <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                    <span className="material-symbols-outlined text-sm">smartphone</span>
+                </div>
+                <h3 className="font-semibold text-slate-900">Canlı Önizleme</h3>
             </div>
 
-            {/* iPhone 16 Pro Style Frame - Bezel-less */}
-            <div className="relative w-full max-w-[280px]">
-                {/* Device Frame - Ultra-thin 1px border, bezel-less */}
-                <div className="relative bg-gradient-to-br from-slate-100 to-slate-200 rounded-[3rem] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-slate-300/20 overflow-hidden">
-                    {/* Dynamic Island (subtle pill shape at top) */}
-                    <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-7 bg-slate-900/90 rounded-full z-20 backdrop-blur-sm"></div>
+            {/* Premium White Phone Frame */}
+            <div className="relative mx-auto">
+                {/* Outer Frame (Shadow & Depth) */}
+                <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-tr from-slate-200 via-slate-100 to-white transform translate-y-4 scale-[1.02] blur-xl opacity-50"></div>
 
-                    {/* Screen Content */}
-                    <div className="relative pt-12 pb-6 px-4 h-[540px] overflow-y-auto bg-slate-50">
-                        {/* New Announcement Card Implementation (Green Border Style) */}
-                        <div className="bg-white rounded-xl border border-green-500 shadow-sm p-4 mt-6">
-                            {/* Header: Badge and Date */}
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="bg-pink-100 text-pink-600 text-[10px] font-bold px-2 py-1 rounded inline-block">
-                                    EN GÜNCEL DUYURU
-                                </span>
-                                <div className="flex items-center gap-1 text-gray-500 text-xs font-medium">
-                                    <Calendar weight="fill" className="w-3.5 h-3.5 text-gray-400" />
-                                    <span>{formattedDate}</span>
+                {/* Main Device Body */}
+                <div className="relative bg-white border-[8px] border-slate-100 outline outline-1 outline-slate-200 rounded-[3rem] h-[640px] w-full max-w-[320px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15),inset_0_0_0_2px_rgba(255,255,255,1)]">
+
+                    {/* Notch/Dynamic Island Area */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-7 w-32 bg-slate-900 rounded-b-2xl z-30 flex items-center justify-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                        <div className="w-8 h-1.5 rounded-full bg-slate-800"></div>
+                    </div>
+
+                    {/* Side Buttons */}
+                    <div className="absolute -left-[10px] top-28 h-10 w-[4px] bg-slate-200 rounded-l-md shadow-sm"></div>
+                    <div className="absolute -left-[10px] top-40 h-16 w-[4px] bg-slate-200 rounded-l-md shadow-sm"></div>
+                    <div className="absolute -right-[10px] top-32 h-20 w-[4px] bg-slate-200 rounded-r-md shadow-sm"></div>
+
+                    {/* Inner Screen Area */}
+                    <div className="h-full w-full bg-slate-50 rounded-[2.5rem] overflow-hidden relative border-[3px] border-black/5">
+
+                        {/* Status Bar - Removed as requested */}
+
+
+                        {/* App Header (Clean White Premium) */}
+                        <div className="bg-white/80 backdrop-blur-md border-b border-slate-100 pt-14 pb-4 px-4 sticky top-0 z-10">
+                            <div className="flex items-center gap-3">
+                                <button className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-colors">
+                                    <span className="material-symbols-outlined text-sm">arrow_back</span>
+                                </button>
+                                <span className="font-bold text-slate-800 text-sm">Duyuru Detayı</span>
+                                <div className="ml-auto flex gap-2">
+                                    <button className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600">
+                                        <span className="material-symbols-outlined text-sm">share</span>
+                                    </button>
                                 </div>
                             </div>
-
-                            {/* Dynamic Title */}
-                            <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight">
-                                {title || "Duyuru Başlığı"}
-                            </h3>
-
-                            {/* Dynamic Content */}
-                            <div className="text-sm leading-relaxed text-gray-600 whitespace-pre-wrap">
-                                {content || "Duyuru içeriğini buraya yazın..."}
-                            </div>
-
-                            {/* Static Button Placeholder */}
-                            <button className="w-full bg-green-700 text-white text-sm font-semibold py-2.5 rounded-lg mt-5 hover:bg-green-800 transition-colors pointer-events-none shadow-sm flex items-center justify-center gap-2">
-                                Tüm Detayları Gör
-                            </button>
                         </div>
+
+                        {/* Main Content Area */}
+                        <div className="p-5 overflow-y-auto h-[calc(100%-90px)] no-scrollbar">
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100/60"
+                            >
+                                {/* Category Verification Badge */}
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wide border border-red-100">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+                                        Duyuru
+                                    </span>
+                                    <span className="text-[10px] font-medium text-slate-400">
+                                        Henüz yayınlanmadı
+                                    </span>
+                                </div>
+
+                                {/* Title */}
+                                <div className="min-h-[2rem] mb-4">
+                                    {title ? (
+                                        <h1 className="text-xl font-bold text-slate-900 leading-tight">
+                                            {title}
+                                        </h1>
+                                    ) : (
+                                        <div className="space-y-2 animate-pulse">
+                                            <div className="h-6 w-3/4 bg-slate-100 rounded-lg"></div>
+                                            <div className="h-6 w-1/2 bg-slate-100 rounded-lg"></div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Divider */}
+                                <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-100 to-transparent my-4"></div>
+
+                                {/* Content */}
+                                <div className="min-h-[10rem]">
+                                    {content ? (
+                                        <div className="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed text-sm">
+                                            <p className="whitespace-pre-wrap">{content}</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3 animate-pulse">
+                                            <div className="h-3 w-full bg-slate-50 rounded"></div>
+                                            <div className="h-3 w-5/6 bg-slate-50 rounded"></div>
+                                            <div className="h-3 w-4/6 bg-slate-50 rounded"></div>
+                                            <div className="h-3 w-full bg-slate-50 rounded"></div>
+                                            <div className="h-3 w-3/4 bg-slate-50 rounded"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+
+                            {/* Bottom Context Info */}
+                            <div className="mt-6 flex flex-col gap-3">
+                                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100/50">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                            <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-900">Yönetim Tarafından</p>
+                                            <p className="text-[10px] text-slate-500">Tüm sakinler görebilir</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Navigation Bar Mockup */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-slate-300 rounded-full z-20"></div>
                     </div>
                 </div>
-
-                {/* Subtle reflection effect */}
-                <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-br from-white/40 to-transparent pointer-events-none"></div>
             </div>
         </div>
     );

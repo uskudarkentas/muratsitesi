@@ -6,39 +6,17 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  RESIDENT
-}
-
-enum StageStatus {
-  LOCKED
-  ACTIVE
-  COMPLETED
-}
-
-enum PostType {
-  ANNOUNCEMENT
-  MEETING
-  SURVEY
-}
-
-enum ActionType {
-  LOGIN
-  VIEW_POST
-  VOTE
-  PAGE_VIEW      // Track page/route visits
-  SHARE          // Track share button clicks
-}
+// SQLite doesn't support enums, using String instead
 
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
   passwordHash  String    @map("password_hash")
-  role          Role      @default(RESIDENT)
+  role          String    @default("RESIDENT")
   fullName      String    @map("full_name")
   apartmentInfo String?   @map("apartment_info") // Blok/Daire No
   lastLogin     DateTime? @map("last_login")
@@ -54,11 +32,12 @@ model Stage {
   title         String
   slug          String      @unique
   description   String?
-  status        StageStatus @default(LOCKED)
+  status        String      @default("LOCKED")
   sequenceOrder Float       @map("sequence_order") // 1.0, 1.5, 2.0
   isVisible     Boolean     @default(true) @map("is_visible")
   iconKey       String      @map("icon_key")
   variant       String      @default("default") // default, small
+  content       String?       // Block editor design content (JSON string)
   
   posts         Post[]
 
@@ -68,9 +47,9 @@ model Stage {
 model Post {
   id          String   @id @default(uuid())
   stageId     Int      @map("stage_id")
-  type        PostType
+  type        String
   title       String
-  content     Json?    // Editor.js output
+  content     String?    // Editor.js output (JSON string)
   imageUrl    String?  @map("image_url")
   attachmentUrl String? @map("attachment_url")
   isPublished Boolean  @default(false) @map("is_published")
@@ -100,7 +79,7 @@ model SurveyVote {
 model AnalyticsLog {
   id        String     @id @default(uuid())
   userId    String?    @map("user_id") // Nullable if tracking guests (though context says private)
-  action    ActionType
+  action    String
   targetId  String?    @map("target_id") // Post ID or Stage ID
   ipAddress String?    @map("ip_address")
   timestamp DateTime   @default(now())

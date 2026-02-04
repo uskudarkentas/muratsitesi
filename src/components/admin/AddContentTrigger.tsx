@@ -32,10 +32,10 @@ export function AddContentTrigger({
                     opacity: isHovered ? 1 : 0,
                 }}
                 transition={{ duration: 0.2 }}
-                className="relative z-10 size-10 rounded-full bg-gray-400 hover:bg-gray-500 text-white shadow-lg flex items-center justify-center transition-all hover:scale-110"
+                className="relative z-10 w-6 h-6 rounded-full bg-gray-200 hover:bg-[#ed2630] text-white shadow-md flex items-center justify-center transition-all hover:scale-110"
                 aria-label="İçerik Ekle"
             >
-                <span className="material-symbols-outlined !text-2xl">add</span>
+                <span className="material-symbols-outlined !text-[16px] font-bold">add</span>
             </motion.button>
 
             {/* Tooltip */}

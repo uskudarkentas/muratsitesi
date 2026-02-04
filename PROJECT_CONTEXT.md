@@ -93,6 +93,12 @@ Ana ekrandaki timeline, bir tarih seçici (date picker) tekerleği gibi davranma
 * Address bar gizlenip açıldığında sayfa zıplamamalıdır.
 * Çentik (Safe Area) boşlukları `env(safe-area-inset-top)` ile yönetilmelidir.
 
+### 4.4. Özel Aşama Görünümleri
+*   **Temsili Sözleşme:** Bu aşama, timeline üzerinde diğer aşamalardan daha küçük görünmelidir.
+    *   **İkon:** Dolu yıldız (`star`, `fill: 1`).
+    *   **Renk:** Sarı/Altın (`#FCD535`).
+    *   **Boyut:** Standart ikonlardan yaklaşık %30-40 daha küçük.
+
 ---
 
 ## 5. Admin Panel (CMS) Gereksinimleri

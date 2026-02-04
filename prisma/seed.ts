@@ -1,10 +1,6 @@
-import { PrismaClient, StageStatus, PostType } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
+import { PrismaClient } from '@prisma/client';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
     console.log('🌱 Starting database seed...');
@@ -21,7 +17,7 @@ async function main() {
             title: "Başvuru",
             slug: "basvuru",
             description: "Kentsel dönüşüm başvuru süreci tamamlandı.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 1.0,
             iconKey: "folder_open"
         },
@@ -29,7 +25,7 @@ async function main() {
             title: "Ön Teklif",
             slug: "on-teklif",
             description: "Ön teklif çalışmaları hazırlandı ve sunuldu.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 2.0,
             iconKey: "upload_file"
         },
@@ -37,7 +33,7 @@ async function main() {
             title: "Kesin Teklif",
             slug: "kesin-teklif",
             description: "Kesin teklifler belirlendi ve onaylandı.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 3.0,
             iconKey: "check_box"
         },
@@ -45,7 +41,7 @@ async function main() {
             title: "Uzlaşma Görüşmeleri",
             slug: "uzlasma-gorusmeleri",
             description: "Hak sahipleri ile uzlaşma sağlandı.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 4.0,
             iconKey: "groups"
         },
@@ -53,7 +49,7 @@ async function main() {
             title: "Temsili Sözleşme",
             slug: "temsili-sozlesme",
             description: "Temsilciler heyeti ile sözleşme imzalandı.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 5.0,
             iconKey: "star"
         },
@@ -61,7 +57,7 @@ async function main() {
             title: "Karot Alımı",
             slug: "karot-alimi",
             description: "Binalardan karot örnekleri alındı ve analiz edildi.",
-            status: StageStatus.COMPLETED,
+            status: "COMPLETED",
             sequenceOrder: 6.0,
             iconKey: "science"
         },
@@ -69,7 +65,7 @@ async function main() {
             title: "Riskli Yapı İlanı",
             slug: "riskli-yapi-ilani",
             description: "Yapıların riskli olduğu resmen ilan edildi.",
-            status: StageStatus.ACTIVE,
+            status: "ACTIVE",
             sequenceOrder: 7.0,
             iconKey: "apartment"
         },
@@ -77,7 +73,7 @@ async function main() {
             title: "Sözleşme",
             slug: "sozlesme",
             description: "Müteahhit ile ana sözleşme imzalanacak.",
-            status: StageStatus.LOCKED,
+            status: "LOCKED",
             sequenceOrder: 8.0,
             iconKey: "signature"
         },
@@ -85,7 +81,7 @@ async function main() {
             title: "Tahliye Süreci",
             slug: "tahliye-sureci",
             description: "Binaların tahliye süreci başlayacak.",
-            status: StageStatus.LOCKED,
+            status: "LOCKED",
             sequenceOrder: 9.0,
             iconKey: "moving"
         },
@@ -93,7 +89,7 @@ async function main() {
             title: "Ruhsat Alımı",
             slug: "ruhsat-alimi",
             description: "İnşaat ruhsatı başvurusu yapılacak.",
-            status: StageStatus.LOCKED,
+            status: "LOCKED",
             sequenceOrder: 10.0,
             iconKey: "article"
         },
@@ -101,7 +97,7 @@ async function main() {
             title: "Yıkım Süreci",
             slug: "yikim-sureci",
             description: "Binaların yıkım işlemleri gerçekleştirilecek.",
-            status: StageStatus.LOCKED,
+            status: "LOCKED",
             sequenceOrder: 11.0,
             iconKey: "domain_disabled"
         },
@@ -109,7 +105,7 @@ async function main() {
             title: "Anahtar Teslim",
             slug: "anahtar-teslim",
             description: "Yeni dairelerin teslimi yapılacak.",
-            status: StageStatus.LOCKED,
+            status: "LOCKED",
             sequenceOrder: 12.0,
             iconKey: "key"
         }
@@ -136,11 +132,11 @@ async function main() {
     await prisma.post.create({
         data: {
             stageId: activeStage.id,
-            type: PostType.ANNOUNCEMENT,
+            type: "ANNOUNCEMENT",
             title: "Belediye Onayı Alındı",
             isPublished: true,
             publishedAt: new Date(), // Now
-            content: {
+            content: JSON.stringify({
                 time: Date.now(),
                 blocks: [
                     {
@@ -167,7 +163,7 @@ async function main() {
                     }
                 ],
                 version: "2.29.0"
-            }
+            })
         }
     });
 
@@ -175,12 +171,12 @@ async function main() {
     await prisma.post.create({
         data: {
             stageId: activeStage.id,
-            type: PostType.MEETING,
+            type: "MEETING",
             title: "Bilgilendirme Toplantısı",
             isPublished: true,
             publishedAt: new Date(Date.now() - 3600000), // 1 hour ago
             eventDate: new Date("2026-02-15T14:00:00Z"), // Specific future date
-            content: {
+            content: JSON.stringify({
                 time: Date.now(),
                 blocks: [
                     {
@@ -192,7 +188,7 @@ async function main() {
                     }
                 ],
                 version: "2.29.0"
-            }
+            })
         }
     });
 
@@ -200,12 +196,12 @@ async function main() {
     await prisma.post.create({
         data: {
             stageId: activeStage.id,
-            type: PostType.SURVEY,
+            type: "SURVEY",
             title: "Dış Cephe Renk Seçimi",
             isPublished: true,
             publishedAt: new Date(Date.now() - 7200000), // 2 hours ago
             eventDate: new Date("2026-03-01T00:00:00Z"), // Survey deadline
-            content: {
+            content: JSON.stringify({
                 time: Date.now(),
                 blocks: [
                     {
@@ -217,7 +213,7 @@ async function main() {
                     }
                 ],
                 version: "2.29.0"
-            }
+            })
             // Note: Survey options logic would typically be in content or separate relation,
             // simplifying here as per current schema which uses SurveyVote relation primarily,
             // but UI expects options in content or separate field? 

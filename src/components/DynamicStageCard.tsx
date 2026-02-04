@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { useTimelineContext } from "@/context/TimelineContext";
 import { getLatestStagePost } from "@/actions/timeline";
 import { RichTextRenderer } from "@/components/RichTextRenderer";
@@ -11,6 +12,7 @@ interface PostData {
     id: string;
     title: string;
     content: any;
+    type: "ANNOUNCEMENT" | "MEETING" | "SURVEY";
     publishedAt: Date | null;
 }
 
@@ -78,11 +80,23 @@ export function DynamicStageCard({ stageId }: { stageId: number }) {
         );
     }
 
+    const TYPE_CONFIG = {
+        ANNOUNCEMENT: { label: 'Duyuru', color: 'text-purple-500 bg-purple-50' },
+        MEETING: { label: 'Toplantı', color: 'text-blue-500 bg-blue-50' },
+        SURVEY: { label: 'Anket', color: 'text-orange-500 bg-orange-50' }
+    };
+
+    const config = TYPE_CONFIG[post.type] || TYPE_CONFIG.ANNOUNCEMENT;
+
     return (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-left">
             <div className="mb-4">
-                <span className="text-xs font-semibold text-primary uppercase tracking-wider bg-primary/10 px-2 py-1 rounded-md">
-                    En Güncel Duyuru
+                <span className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border",
+                    config.color,
+                    config.color.split(' ')[0].replace('text-', 'border-').replace('500', '100')
+                )}>
+                    {config.label}
                 </span>
             </div>
 

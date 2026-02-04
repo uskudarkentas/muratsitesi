@@ -5,9 +5,10 @@ import { Stage } from "@/lib/stages";
 import { DynamicStageCard } from "@/components/DynamicStageCard";
 
 interface StageCardProps {
-    stage: Stage;
+    stage: any;
     isCurrent: boolean;
     isPast: boolean;
+    isFuture: boolean;
     activeStageIndex: number;
     onShare: (stage: any) => void;
     variant?: 'desktop' | 'mobile';
@@ -18,6 +19,7 @@ export function StageCard({
     stage,
     isCurrent,
     isPast,
+    isFuture,
     activeStageIndex,
     onShare,
     variant = 'desktop',
@@ -36,6 +38,8 @@ export function StageCard({
             isCurrent ? "border-2 border-[#98EB94]" : "border border-gray-200 dark:border-gray-700"
         )
         : getCardClassName(isCurrent);
+
+    const isLinkAllowed = isCurrent || isPast;
 
     return (
         <div className={containerClass}>
@@ -61,21 +65,7 @@ export function StageCard({
                 </>
             )}
 
-            {/* Actions / Buttons - Kept for both but logic might need adjustment if DynamicStageCard has its own */}
-            {/* DynamicStageCard handles its own content. But maybe we keep the link button for "Details"? */}
-            {/* User request: "Content Panel" (Desktop) should use fetch logic. 
-                DynamicStageCard renders Title + Date + RichText. 
-                So for desktop, we might NOT want the original Title/Description/Button layout exactly as before.
-                Current implementation of DynamicStageCard includes Title and Date.
-                
-                However, for the Detail Link ("Detayları Gör"), it is still relevant.
-                I will append the "Detayları Gör" button BELOW the DynamicStageCard content if desktop.
-            */}
-
             <div className="flex items-center justify-between mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
-                {/* Share Button Logic - Mobile mostly, Desktop has it in rich text? 
-                     User said: "For Images: Add share". But main card sharing is good too.
-                 */}
                 <div className="flex items-center gap-3">
                     {!isCurrent && variant === 'desktop' && (
                         <span className="text-xs text-gray-400">Daha eski duyurular için detaya gidiniz</span>
@@ -96,26 +86,15 @@ export function StageCard({
                     href={`/asamalar/${stage.slug}`}
                     className={cn(
                         "px-8 py-3 rounded-lg text-sm font-semibold transition-colors",
-                        (variant === 'mobile'
-                            ? (isCurrent || (mobileIndex !== undefined && mobileIndex < activeStageIndex))
-                            : (isCurrent || isPast)
-                        )
+                        isLinkAllowed
                             ? "bg-success hover:bg-green-700 text-white"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none"
                     )}
                     onClick={(e) => {
-                        const allow = variant === 'mobile'
-                            ? (isCurrent || (mobileIndex !== undefined && mobileIndex < activeStageIndex))
-                            : (isCurrent || isPast);
-                        if (!allow) e.preventDefault();
+                        if (!isLinkAllowed) e.preventDefault();
                     }}
                 >
-                    {(() => {
-                        const allow = variant === 'mobile'
-                            ? (isCurrent || (mobileIndex !== undefined && mobileIndex < activeStageIndex))
-                            : (isCurrent || isPast);
-                        return allow ? "Tüm Detayları Gör" : (variant === 'mobile' ? "Kilitli" : "Henüz Aktif Değil");
-                    })()}
+                    {isLinkAllowed ? "Tüm Detayları Gör" : (variant === 'mobile' ? "Kilitli" : "Henüz Aktif Değil")}
                 </Link>
             </div>
 

@@ -152,4 +152,14 @@
     /* 14px -> 16px */
     @apply leading-relaxed;
   }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

@@ -1,7 +1,7 @@
 export const TIMELINE_CONSTANTS = {
     // Responsive item heights (in vh) based on visible count
     ITEM_HEIGHT_VH: 20,           // Base: 20vh for 2-1-2 (5 items)
-    CONTAINER_HEIGHT_VH: 85,      // 85vh visible area (increased from 70)
+    CONTAINER_HEIGHT_VH: 70,      // 70vh visible area (reduced correctly center items)
     ACTIVE_STAGE_ID: 7,           // Riskli Yapı İlanı
 
     // Visibility configuration for 2-1-2 pattern

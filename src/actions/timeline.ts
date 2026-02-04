@@ -25,12 +25,11 @@ export async function getLatestStagePost(stageId: number) {
     }
 }
 
-// 2. Fetch "Next Steps" (Future Meetings/Surveys) for Project Summary
-export async function getFutureEvents(stageId: number) {
+// 2. Fetch "Next Project-Wide Event" (Future Meetings/Surveys) for Project Summary
+export async function getFutureEvents() {
     try {
         const event = await db.post.findFirst({
             where: {
-                stageId: stageId,
                 isPublished: true,
                 type: {
                     in: ["MEETING", "SURVEY"],
@@ -42,10 +41,13 @@ export async function getFutureEvents(stageId: number) {
             orderBy: {
                 eventDate: "asc", // Closest event first
             },
+            include: {
+                stage: true, // Include stage info for context
+            },
         });
         return event;
     } catch (error) {
-        console.error(`Error fetching future events for stage ${stageId}:`, error);
+        console.error(`Error fetching project-wide future events:`, error);
         return null;
     }
 }

@@ -88,41 +88,30 @@ export function TimelineItem({
                     )}>
                         {stage.title}
                     </span>
-
-                    {isPast && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-1 justify-end text-[#98EB94] text-sm mt-1 font-bold"
-                        >
-                            <span>Tamamlandı</span>
-                            <span className="material-symbols-outlined !text-sm">check</span>
-                        </motion.div>
-                    )}
-                    {isCurrent && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-1 justify-end text-[#98EB94] text-xs mt-1 font-medium"
-                        >
-                            <span>Süreç Devam Ediyor</span>
-                            <span className="material-symbols-outlined !text-sm animate-spin">sync</span>
-                        </motion.div>
-                    )}
-                    {isFuture && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-1 justify-end text-gray-400 text-xs mt-1 font-medium"
-                        >
-                            <span>Sürece Başlanmadı</span>
-                            <span className="material-symbols-outlined !text-sm">lock</span>
-                        </motion.div>
-                    )}
+                    <span className={cn(
+                        "text-[10px] uppercase tracking-wider font-medium opacity-60 flex items-center gap-1",
+                        isCurrent && "text-[#98EB94] opacity-100",
+                        isPast && "text-gray-500",
+                        isFuture && "text-gray-400"
+                    )}>
+                        {isPast ? (
+                            <>
+                                Tamamlandı <span className="material-symbols-outlined !text-[12px]">check</span>
+                            </>
+                        ) : isCurrent ? (
+                            <>
+                                Süreç Devam Ediyor <span className="material-symbols-outlined !text-[12px] animate-spin-slow">sync</span>
+                            </>
+                        ) : (
+                            <>
+                                Sürece Başlanmadı <span className="material-symbols-outlined !text-[12px]">lock</span>
+                            </>
+                        )}
+                    </span>
                 </div>
             </motion.div>
 
-            {/* Mobile Title & Status - Side positioned (Left side like Desktop) */}
+            {/* Mobile Title - Side positioned */}
             <div className="md:hidden absolute right-1/2 mr-24 min-w-[140px] text-right pointer-events-none flex flex-col items-end gap-1 z-30">
                 <span className={cn(
                     "text-sm font-bold block leading-tight",
@@ -130,27 +119,24 @@ export function TimelineItem({
                 )}>
                     {stage.title}
                 </span>
-
-                {/* Mobile Status Badge */}
-                {isPast && (
-                    <span className="text-[10px] font-bold text-[#98EB94] flex items-center gap-1">
-                        Tamamlandı
-                        <span className="material-symbols-outlined !text-[12px]">check</span>
-                    </span>
-                )}
-                {isCurrent && (
-                    <span className="text-[10px] font-bold text-[#98EB94] flex items-center gap-1">
-                        Süreç Devam Ediyor
-                        <span className="material-symbols-outlined !text-[12px] animate-spin">sync</span>
-                    </span>
-                )}
-                {/* Future State - Added as requested */}
-                {isFuture && (
-                    <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 flex items-center gap-1">
-                        Sürece Başlanmadı
-                        <span className="material-symbols-outlined !text-[12px]">lock</span>
-                    </span>
-                )}
+                <span className={cn(
+                    "text-[8px] uppercase tracking-wider font-bold flex items-center gap-1",
+                    isCurrent ? "text-[#98EB94]" : "text-gray-400"
+                )}>
+                    {isPast ? (
+                        <>
+                            Tamamlandı <span className="material-symbols-outlined !text-[10px]">check</span>
+                        </>
+                    ) : isCurrent ? (
+                        <>
+                            Süreç Devam Ediyor <span className="material-symbols-outlined !text-[10px] animate-spin-slow">sync</span>
+                        </>
+                    ) : (
+                        <>
+                            Sürece Başlanmadı <span className="material-symbols-outlined !text-[10px]">lock</span>
+                        </>
+                    )}
+                </span>
             </div>
 
             {/* Center Icon Circle */}
@@ -161,7 +147,7 @@ export function TimelineItem({
                 className={cn(
                     "relative flex items-center justify-center rounded-full z-20 transition-all duration-300 cursor-pointer group",
                     stage.variant === 'small'
-                        ? (isCurrent ? "size-14" : "size-10") // Smaller sizes for 'small' variant (Temsili Sözleşme)
+                        ? (isCurrent ? "size-14" : "size-10") // Smaller sizes for 'small' variant
                         : (isCurrent ? "size-20" : "size-16"), // Standard sizes
 
                     // Admin Future Visibility Override
@@ -234,13 +220,13 @@ export function TimelineItem({
                         )}
                         style={stage.variant === 'small' ? { fontVariationSettings: "'FILL' 1" } : undefined}
                     >
-                        {stage.icon || stage.iconKey}
+                        {stage.variant === 'small' ? 'star' : (stage.icon || stage.iconKey)}
                     </span>
                 </div>
             </motion.div>
 
-            {/* Right Side Content Card - Desktop */}
-            {isFocused && (
+            {/* Right Side Content Card - Desktop - Hidden in Admin Mode */}
+            {isFocused && !isAdmin && (
                 <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}

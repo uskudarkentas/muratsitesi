@@ -21,6 +21,11 @@ export default async function AdminPage() {
     // Fetch stages for Admin Timeline
     const stages = await db.stage.findMany({
         orderBy: { sequenceOrder: 'asc' },
+        include: {
+            posts: {
+                orderBy: { createdAt: "desc" }
+            }
+        }
     });
 
     return (
@@ -50,7 +55,7 @@ export default async function AdminPage() {
                         </div>
                     </div>
 
-                    <div className="w-full max-w-screen-2xl mx-auto relative h-full">
+                    <div className="w-full max-w-screen-2xl mx-auto relative h-full lg:pl-80 transition-all duration-300">
                         {/* Main Content - Centered Timeline */}
                         <div className="flex flex-col items-center w-full pt-6 pb-10">
                             {/* Spotlight gradient */}

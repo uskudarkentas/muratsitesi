@@ -29,12 +29,12 @@ export default async function Home() {
         </div>
 
         <Header />
-        <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col no-scrollbar">
 
           {/* Project Summary - Fixed Left relative to Scroll Container */}
           <ProjectSummarySidebar />
 
-          <div className="w-full max-w-screen-2xl mx-auto relative h-full">
+          <div className="w-full max-w-screen-2xl mx-auto relative flex-1">
 
             {/* Main Content - Perfectly Centered */}
             <div className="flex flex-col items-center w-full pt-6 pb-10">
@@ -51,8 +51,8 @@ export default async function Home() {
               <Timeline stages={stages as any} />
             </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
       </main >
     </TimelineProvider>
   );

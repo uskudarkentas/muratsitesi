@@ -33,12 +33,15 @@ interface TimelineProps {
 export default function Timeline({ stages }: TimelineProps) {
     const STAGES = stages; // Map prop to local variable to minimize code changes
 
+    // Find the stage marked as ACTIVE in the database
+    const dbActiveIndex = STAGES.findIndex(s => s.status === 'ACTIVE');
+    const activeStageIndex = dbActiveIndex !== -1 ? dbActiveIndex : 0;
+    const currentActiveStage = STAGES[activeStageIndex] || STAGES[0];
+
     const containerRef = useRef<HTMLDivElement>(null);
-    const { focusedIndex, handleScroll, scrollToIndex } = useTimelineScroll(containerRef);
+    const { focusedIndex, handleScroll, scrollToIndex } = useTimelineScroll(containerRef, activeStageIndex);
     const { handleShare } = useStageShare();
     const [mobilePopupIndex, setMobilePopupIndex] = useState<number | null>(null);
-
-    const activeStageIndex = STAGES.findIndex((s) => s.id === TIMELINE_CONSTANTS.ACTIVE_STAGE_ID);
 
     // Context for Sidebar/Content sync
     const { setFocusedStageId } = useTimelineContext();
@@ -97,9 +100,9 @@ export default function Timeline({ stages }: TimelineProps) {
 
                     {STAGES.map((stage, index) => {
                         const isFocused = focusedIndex === index;
-                        const isCurrent = stage.id === TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
-                        const isPast = stage.id < TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
-                        const isFuture = stage.id > TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
+                        const isCurrent = index === activeStageIndex;
+                        const isPast = stage.status === 'COMPLETED';
+                        const isFuture = stage.status === 'LOCKED';
 
                         // 2-1-2 Window visibility calculation
                         const isVisible = index >= visibleStart && index <= visibleEnd;
@@ -129,7 +132,7 @@ export default function Timeline({ stages }: TimelineProps) {
                 <AnimatePresence>
                     {mobilePopupIndex !== null && (
                         <TimelineMobileModal
-                            stageIndex={mobilePopupIndex}
+                            stage={STAGES[mobilePopupIndex]}
                             onClose={() => setMobilePopupIndex(null)}
                             activeStageIndex={activeStageIndex}
                             onShare={handleShare}

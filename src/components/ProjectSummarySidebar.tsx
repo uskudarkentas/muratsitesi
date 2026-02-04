@@ -32,14 +32,15 @@ export function ProjectSummarySidebar() {
     // Fetch future events for the ACTIVE STAGE (Global Project Context)
     // We do not depend on focusedStageId here, so scrolling does not hide the event.
     useEffect(() => {
-        async function fetchEvents() {
-            const targetId = TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
-            if (targetId) {
-                const event = await getFutureEvents(targetId);
+        async function fetchEvent() {
+            try {
+                const event = await getFutureEvents();
                 setFutureEvent(event as any);
+            } catch (error) {
+                console.error("Failed to fetch upcoming event:", error);
             }
         }
-        fetchEvents();
+        fetchEvent();
     }, []);
 
     return (

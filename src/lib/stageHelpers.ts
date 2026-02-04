@@ -29,23 +29,7 @@ export function getStageDescription(
     activeStageIndex: number,
     popupIndex?: number
 ): string {
-    // If popupIndex is provided, we use the mobile logic comparison
-    // If not, we use basic isCurrent/isPast logic
-
-    // For mobile usage where we pass an index
-    if (popupIndex !== undefined) {
-        const latestAnnouncement = getLatestAnnouncement(stageId);
-        if (latestAnnouncement && isCurrent) {
-            return getAnnouncementPreview(latestAnnouncement);
-        }
-        return isCurrent
-            ? "Bu aşama şu an aktif. Henüz duyuru bulunmamaktadır."
-            : popupIndex < activeStageIndex
-                ? "Bu aşama başarıyla tamamlanmıştır."
-                : "Bu aşama henüz aktif değildir.";
-    }
-
-    // For desktop usage
+    // Basic isCurrent/isPast logic
     const latestAnnouncement = getLatestAnnouncement(stageId);
     if (latestAnnouncement && isCurrent) {
         return getAnnouncementPreview(latestAnnouncement);

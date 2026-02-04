@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
     return (
         <footer className="w-full bg-card border-t border-border py-4 px-6 lg:px-12 mt-auto z-20">
@@ -29,7 +31,7 @@ export default function Footer() {
                         <span className="text-gray-300">·</span>
                         <span className="hover:text-[#ed2630] transition-colors cursor-pointer">KVKK</span>
                         <span className="text-gray-300">·</span>
-                        <a href="https://www.uskudar.bel.tr/iletisim" target="_blank" rel="noopener noreferrer" className="hover:text-[#ed2630] transition-colors">İletişim</a>
+                        <Link href="/iletisim" className="hover:text-[#ed2630] transition-colors">İletişim</Link>
                         <span className="text-gray-300">·</span>
                         <span className="hover:text-[#ed2630] transition-colors cursor-pointer">SSS</span>
                     </div>

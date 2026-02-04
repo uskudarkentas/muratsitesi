@@ -5,21 +5,23 @@ import { STAGES } from "@/lib/stages";
 import { TIMELINE_CONSTANTS } from "@/lib/constants";
 
 interface TimelineMobileModalProps {
-    stageIndex: number;
+    stage: any;
     onClose: () => void;
     activeStageIndex: number;
     onShare: (stage: any) => void;
 }
 
 export function TimelineMobileModal({
-    stageIndex,
+    stage,
     onClose,
     activeStageIndex,
     onShare
 }: TimelineMobileModalProps) {
-    const stage = STAGES[stageIndex];
-    const isCurrent = stage.id === TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
-    const isPast = stage.id < TIMELINE_CONSTANTS.ACTIVE_STAGE_ID;
+    if (!stage) return null;
+
+    const isCurrent = stage.status === 'ACTIVE';
+    const isPast = stage.status === 'COMPLETED';
+    const isFuture = stage.status === 'LOCKED';
 
     return (
         <>
@@ -52,10 +54,10 @@ export function TimelineMobileModal({
                         stage={stage}
                         isCurrent={isCurrent}
                         isPast={isPast}
+                        isFuture={isFuture}
                         activeStageIndex={activeStageIndex}
                         onShare={onShare}
                         variant="mobile"
-                        mobileIndex={stageIndex}
                     />
                 </div>
             </motion.div>

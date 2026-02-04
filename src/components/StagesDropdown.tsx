@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface Stage {
     id: number;
@@ -16,12 +18,17 @@ interface StagesDropdownProps {
 
 export function StagesDropdown({ stages }: StagesDropdownProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const pathname = usePathname();
+    const isActive = pathname?.startsWith("/asamalar");
 
     return (
         <div className="relative">
             <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="text-primary font-medium flex items-center gap-1 hover:opacity-80 transition-opacity"
+                className={cn(
+                    "flex items-center gap-1 transition-opacity hover:opacity-80",
+                    isActive || isDropdownOpen ? "text-primary font-bold" : "text-muted-foreground hover:text-primary"
+                )}
             >
                 Aşamalar
                 <span className="material-symbols-outlined !text-xl">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Paperclip } from "@phosphor-icons/react";
@@ -12,16 +13,36 @@ interface SimplifiedAnnouncementModalProps {
     isOpen: boolean;
     onClose: () => void;
     stageId: number;
+    initialType?: 'heading' | 'text' | 'image' | null;
+    initialPostType?: 'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null;
 }
 
 export function SimplifiedAnnouncementModal({
     isOpen,
     onClose,
     stageId,
+    initialType,
+    initialPostType
 }: SimplifiedAnnouncementModalProps) {
     const router = useRouter();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [selectedType, setSelectedType] = useState<"ANNOUNCEMENT" | "MEETING" | "SURVEY">("ANNOUNCEMENT");
+
+    useEffect(() => {
+        if (isOpen && initialType === 'heading') {
+            setTitle("Yeni Başlık");
+        } else if (isOpen) {
+            setTitle("");
+            setContent("");
+        }
+
+        if (isOpen && initialPostType) {
+            setSelectedType(initialPostType);
+        } else if (isOpen) {
+            setSelectedType("ANNOUNCEMENT");
+        }
+    }, [isOpen, initialType, initialPostType]);
     const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -67,6 +88,7 @@ export function SimplifiedAnnouncementModal({
                 stageId,
                 title,
                 content,
+                type: selectedType,
                 attachmentUrl: fileUrl, // Using attachmentUrl for generic files
             });
 
@@ -103,7 +125,7 @@ export function SimplifiedAnnouncementModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-slate-900/20 backdrop-blur-xl z-[60]"
+                        className="fixed inset-0 bg-slate-900/10 z-[60]"
                     />
 
                     {/* Modal */}
@@ -137,6 +159,35 @@ export function SimplifiedAnnouncementModal({
                                 {/* Left Column - Form (60%) */}
                                 <div className="flex-1 lg:w-[60%] p-8 overflow-y-auto bg-slate-50/50">
                                     <form onSubmit={handleSubmit} className="space-y-6">
+                                        {/* Post Type Selection */}
+                                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                            <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-3">
+                                                Duyuru Kategorisi
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {[
+                                                    { id: 'ANNOUNCEMENT', label: 'Duyuru', color: 'bg-purple-500', text: 'text-purple-700' },
+                                                    { id: 'MEETING', label: 'Toplantı', color: 'bg-blue-500', text: 'text-blue-700' },
+                                                    { id: 'SURVEY', label: 'Anket', color: 'bg-orange-500', text: 'text-orange-700' }
+                                                ].map((type) => (
+                                                    <button
+                                                        key={type.id}
+                                                        type="button"
+                                                        onClick={() => setSelectedType(type.id as any)}
+                                                        className={cn(
+                                                            "flex items-center gap-2 px-4 py-2 rounded-xl border transition-all",
+                                                            selectedType === type.id
+                                                                ? cn("border-transparent ring-2 ring-offset-2 ring-slate-200 bg-white shadow-sm font-bold", type.text)
+                                                                : "border-slate-100 bg-slate-50 text-slate-500 hover:bg-white hover:border-slate-200"
+                                                        )}
+                                                    >
+                                                        <span className={cn("w-2.5 h-2.5 rounded-full", type.color)}></span>
+                                                        {type.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         {/* Title Field */}
                                         <div>
                                             <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-2">
@@ -149,7 +200,7 @@ export function SimplifiedAnnouncementModal({
                                                 placeholder="Örn: Toplantı Duyurusu"
                                                 required
                                                 maxLength={100}
-                                                className="w-full px-4 py-3 rounded-xl border-0 bg-slate-50/50 text-slate-900 placeholder-slate-400 ring-1 ring-transparent focus:ring-1 focus:ring-slate-300 focus:bg-white transition-all duration-200 ease-in-out shadow-sm"
+                                                className="w-full px-4 py-3 rounded-xl border-0 bg-white text-slate-900 placeholder-slate-400 ring-1 ring-slate-200 focus:ring-1 focus:ring-slate-300 focus:bg-white transition-all shadow-sm"
                                             />
                                             <p className="text-xs text-slate-500 mt-1.5 font-medium">
                                                 {title.length}/100 karakter

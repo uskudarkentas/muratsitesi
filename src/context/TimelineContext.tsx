@@ -11,8 +11,8 @@ interface TimelineContextType {
 const TimelineContext = createContext<TimelineContextType | undefined>(undefined);
 
 export function TimelineProvider({ children }: { children: ReactNode }) {
-    // Default to ACTIVE_STAGE_ID initially
-    const [focusedStageId, setFocusedStageId] = useState<number>(TIMELINE_CONSTANTS.ACTIVE_STAGE_ID);
+    // Default will be synced from AdminTimeline on load
+    const [focusedStageId, setFocusedStageId] = useState<number>(1);
 
     return (
         <TimelineContext.Provider value={{ focusedStageId, setFocusedStageId }}>
