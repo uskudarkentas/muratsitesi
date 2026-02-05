@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import AdminTimeline from "@/components/admin/AdminTimeline";
 import Header from "@/components/Header";
 import { TimelineProvider } from "@/context/TimelineContext";
-import { db } from "@/core/database/client";
+import { stageService } from "@/features/stages/services/stageService";
 
 export const dynamic = "force-dynamic";
 
@@ -18,15 +18,8 @@ export default async function AdminPage() {
         redirect("/admin/login");
     }
 
-    // Fetch stages for Admin Timeline
-    const stages = await db.stage.findMany({
-        orderBy: { sequenceOrder: 'asc' },
-        include: {
-            posts: {
-                orderBy: { createdAt: "desc" }
-            }
-        }
-    });
+    // Fetch stages using service layer
+    const stages = await stageService.getAllStages();
 
     return (
         <TimelineProvider>
@@ -41,8 +34,7 @@ export default async function AdminPage() {
                 ></div>
 
                 <Header />
-
-                <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+                <div className="flex-1 overflow-y-auto">
                     {/* Admin Badge */}
                     <div className="absolute top-4 right-4 z-30">
                         <div className="bg-primary/10 border border-primary/30 rounded-full px-4 py-2 flex items-center gap-2">
@@ -76,7 +68,7 @@ export default async function AdminPage() {
                             </h1>
 
                             <AdminTimeline
-                                stages={stages as any}
+                                stages={stages.map(s => s.toJSON()) as any}
                             />
                         </div>
                     </div>

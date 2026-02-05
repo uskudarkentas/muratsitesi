@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PageBuilderLayout } from "@/components/page-builder/PageBuilderLayout";
 import { PageSelector } from "@/components/page-builder/PageSelector";
-import { getPageContent, savePageContent } from "@/actions/page-content";
+import { getPageContent, savePageContent } from "@/server/actions/pageBuilderActions";
 import { ContentBlock } from "@/types/page-builder";
 import Link from "next/link";
 

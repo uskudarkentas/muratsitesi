@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getStagePosts } from "@/actions/timeline";
-import { getPageContent } from "@/actions/page-content";
+import { getPageContent } from "@/server/actions/pageBuilderActions";
 import Header from "@/components/Header";
 import { BlockRenderer } from "@/components/page-builder/BlockRenderer";
 import Footer from "@/components/Footer";
@@ -12,8 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function StagePage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
 
-    // Fetch page content using the unified action
-    // This action checks PageContent first, then legacy Stage content (and migrates it)
+    // Fetch page content using new server action
     const result = await getPageContent(slug);
 
     if (!result.success || !result.data) {
@@ -21,10 +19,6 @@ export default async function StagePage({ params }: { params: Promise<{ slug: st
     }
 
     const { blocks } = result.data;
-
-    // Fetch real posts from database (if needed for sidebar/other widgets)
-    // kept for compatibility if you have other uses, but typically PageBuilder covers content
-    const posts = await getStagePosts(slug);
 
     return (
         <main className="flex min-h-screen flex-col bg-slate-50">

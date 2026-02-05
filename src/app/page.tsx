@@ -4,17 +4,15 @@ import Timeline from "@/components/Timeline";
 import Footer from "@/components/Footer";
 import { TimelineProvider } from "@/context/TimelineContext";
 import { ProjectSummarySidebar } from "@/components/ProjectSummarySidebar";
-import { db } from "@/core/database/client";
+import { stageService } from "@/features/stages/services/stageService";
 import { PageViewTracker } from "@/components/PageViewTracker";
 
 // Force dynamic rendering since we are fetching data
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  // Fetch stages from database
-  const stages = await db.stage.findMany({
-    orderBy: { sequenceOrder: 'asc' },
-  });
+  // Fetch stages using service layer
+  const stages = await stageService.getAllStages();
 
   return (
     <TimelineProvider>
@@ -47,8 +45,8 @@ export default async function Home() {
               <h1 className="text-xl md:text-2xl font-bold text-[#46474A] mb-8 md:mb-12 text-center px-4 md:px-0 relative z-10 max-w-xl leading-tight">
                 Murat Sitesi <br className="md:hidden" /> Kentsel Dönüşüm Süreci
               </h1>
-              {/* @ts-ignore - DB type vs Component type slight mismatch on icon vs iconKey */}
-              <Timeline stages={stages as any} />
+              {/* Convert domain models to JSON for client component */}
+              <Timeline stages={stages.map(s => s.toJSON()) as any} />
             </div>
           </div>
           <Footer />
