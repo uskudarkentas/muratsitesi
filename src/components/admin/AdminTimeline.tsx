@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTimelineContext } from "@/context/TimelineContext";
-import { deleteStage, moveStageUp, moveStageDown } from "@/actions/admin";
+import { deleteStage } from "@/actions/admin";
 
 
 import { TIMELINE_CONSTANTS } from "@/lib/constants";
@@ -20,7 +20,6 @@ import { AddContentTrigger } from "@/components/admin/AddContentTrigger";
 import { SimplifiedAnnouncementModal } from "@/components/admin/SimplifiedAnnouncementModal";
 import { StageManagerModal } from "@/components/admin/stage-manager/StageManagerModal";
 import { BuilderSidebar } from "@/components/admin/builder/BuilderSidebar";
-import { BlockEditor } from "@/components/admin/editor/BlockEditor";
 
 interface StageData {
     id: number;
@@ -37,7 +36,6 @@ interface StageData {
 
 interface AdminTimelineProps {
     stages: StageData[];
-    // Removed initialAction/Type props in favor of useSearchParams
 }
 
 export default function AdminTimeline({ stages }: AdminTimelineProps) {
@@ -78,15 +76,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
     const [initialContentType, setInitialContentType] = useState<'heading' | 'text' | 'image' | null>(null);
     const [initialPostType, setInitialPostType] = useState<'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null>(null);
 
-    // Design Mode State
-    const [isDesignMode, setIsDesignMode] = useState(false);
-    const [sidebarInsert, setSidebarInsert] = useState<{ type: any; timestamp: number } | null>(null);
-    const handleQuickAddContentType = (stageId: number, type?: 'heading' | 'text' | 'image') => {
-        setSelectedStageId(stageId);
-        setInitialContentType(type || null);
-        setInitialPostType(null); // Ensure post type is reset
-        setShowAnnouncementModal(true);
-    };
 
     // Handle quick add button click for post types (ANNOUNCEMENT, MEETING, SURVEY)
     const handleQuickAddPost = (stageId: number, postType: 'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null = null) => {
@@ -181,19 +170,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
         });
     };
 
-    // Handle Builder Actions
-    const handleBuilderAddContent = (type: 'heading' | 'text' | 'image' | 'pdf' | 'gallery' | 'divider') => {
-        if (isDesignMode) {
-            setSidebarInsert({ type, timestamp: Date.now() });
-            return;
-        }
-
-        const activeStage = STAGES[activeStageIndex];
-        if (activeStage && (type === 'heading' || type === 'text' || type === 'image')) {
-            handleQuickAddContentType(activeStage.id, type);
-        }
-    };
-
     return (
         <>
             {/* Header Controls - Mobile Only / Adapted for Desktop */}
@@ -241,9 +217,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                 onAddPost={(type) => {
                     if (STAGES[activeStageIndex]) handleQuickAddPost(STAGES[activeStageIndex].id, type);
                 }}
-                onAddContent={handleBuilderAddContent}
-                isDesignMode={isDesignMode}
-                onDesignModeChange={setIsDesignMode}
             />
 
             {/* Main Content Layout */}
@@ -291,7 +264,8 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                                 position={0}
                                 onClick={() => {
                                     if (STAGES[0]) {
-                                        handleQuickAdd(STAGES[0].id);
+                                        // handleQuickAdd(STAGES[0].id); // Removed quick add, rely on sidebar
+                                        handleQuickAddPost(STAGES[0].id)
                                     }
                                 }}
                             />
@@ -372,24 +346,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                         })}
                     </div>
 
-                    {/* Block Editor overlay when in Design Mode */}
-                    <AnimatePresence>
-                        {isDesignMode && currentActiveStage && (
-                            <motion.div
-                                initial={{ opacity: 0, x: 100 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 100 }}
-                                className="fixed inset-0 left-80 bg-white z-[60] overflow-y-auto"
-                            >
-                                <BlockEditor
-                                    stage={currentActiveStage}
-                                    onClose={() => setIsDesignMode(false)}
-                                    externalInsert={sidebarInsert}
-                                />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
                     {/* Simplified Announcement Modal */}
                     {selectedStageId !== null && (
                         <SimplifiedAnnouncementModal
@@ -437,7 +393,7 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm md:hidden md:pointer-events-none transition-all"
                                     onClick={() => setStageToDelete(null)}
                                 />
                                 <motion.div
@@ -494,4 +450,3 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
         </>
     );
 }
-

@@ -88,3 +88,14 @@ model AnalyticsLog {
 
   @@map("analytics_logs")
 }
+
+model PageContent {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique // 'home', 'contact', 'risk-notice', etc.
+  blocks     String   // JSON array of content blocks
+  isTemplate Boolean  @default(false) @map("is_template")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("page_contents")
+}

@@ -81,6 +81,15 @@ export function AdminSidebar() {
                         </span>
                         <span className="font-medium">Süreç Yönetimi</span>
                     </Link>
+                    <Link
+                        href="/admin/page-builder"
+                        className="flex items-center gap-3 rounded-lg px-3 py-3 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#3a1d1e]"
+                    >
+                        <span className="material-symbols-outlined">
+                            web
+                        </span>
+                        <span className="font-medium">Sayfa Tasarımı</span>
+                    </Link>
                     <div className="my-2 border-t border-[#e7cfd0] dark:border-[#3a1d1e]"></div>
                     <a
                         href="#"

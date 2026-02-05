@@ -125,7 +125,7 @@ export function SimplifiedAnnouncementModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-slate-900/10 z-[60]"
+                        className="fixed inset-0 bg-slate-900/10 z-[60] md:hidden md:pointer-events-none"
                     />
 
                     {/* Modal */}

@@ -130,7 +130,7 @@ export function StageManagerModal({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm md:hidden md:pointer-events-none"
                     />
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0, y: 20 }}

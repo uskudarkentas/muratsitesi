@@ -20,7 +20,7 @@ export function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-slate-900/20 backdrop-blur-xl z-[60] md:hidden"
+                        className="fixed inset-0 bg-slate-900/20 backdrop-blur-xl z-[60] md:hidden hidden md:pointer-events-none"
                     />
 
                     {/* Drawer */}
