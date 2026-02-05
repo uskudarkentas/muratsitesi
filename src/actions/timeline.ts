@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { db } from "@/core/database/client";
 import { STAGES } from "@/lib/stages";
 
 // 1. Fetch the latest published Post for a given stage (Home - Content Panel)

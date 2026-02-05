@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db as prisma } from "@/lib/db";
+import { db as prisma } from "@/core/database/client";
 import { StageStatus } from "@prisma/client";
 
 

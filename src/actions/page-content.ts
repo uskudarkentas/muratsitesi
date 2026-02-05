@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/lib/db";
+import { db } from "@/core/database/client";
 import { ContentBlock } from "@/types/page-builder";
 import { revalidatePath } from "next/cache";
 

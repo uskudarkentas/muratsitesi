@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import AdminTimeline from "@/components/admin/AdminTimeline";
 import Header from "@/components/Header";
 import { TimelineProvider } from "@/context/TimelineContext";
-import { db } from "@/lib/db";
+import { db } from "@/core/database/client";
 
 export const dynamic = "force-dynamic";
 

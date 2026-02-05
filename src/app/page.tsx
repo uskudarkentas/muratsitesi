@@ -4,7 +4,7 @@ import Timeline from "@/components/Timeline";
 import Footer from "@/components/Footer";
 import { TimelineProvider } from "@/context/TimelineContext";
 import { ProjectSummarySidebar } from "@/components/ProjectSummarySidebar";
-import { db } from "@/lib/db";
+import { db } from "@/core/database/client";
 import { PageViewTracker } from "@/components/PageViewTracker";
 
 // Force dynamic rendering since we are fetching data
