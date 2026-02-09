@@ -10,9 +10,10 @@ import Link from "next/link";
 
 export default function PageBuilderPage() {
     const router = useRouter();
-    const [selectedSlug, setSelectedSlug] = useState("home");
+    const [selectedSlug, setSelectedSlug] = useState("on-teklif");
     const [blocks, setBlocks] = useState<ContentBlock[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [stageOrder, setStageOrder] = useState<number | undefined>(undefined);
 
     // Load page content when slug changes
     useEffect(() => {
@@ -24,23 +25,41 @@ export default function PageBuilderPage() {
         try {
             const result = await getPageContent(slug);
             if (result.success && result.data) {
+                console.log('PageBuilderPage: stageOrder from action:', result.data.stageOrder);
                 setBlocks(result.data.blocks);
+                // @ts-ignore - stageOrder exists in the response now
+                setStageOrder(result.data.stageOrder);
             } else {
                 // Page doesn't exist yet, start with empty blocks
                 setBlocks([]);
+                setStageOrder(undefined);
             }
         } catch (error) {
             console.error("Error loading page content:", error);
             setBlocks([]);
+            setStageOrder(undefined);
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleSave = async (updatedBlocks: ContentBlock[]) => {
-        const result = await savePageContent(selectedSlug, updatedBlocks);
-        if (!result.success) {
-            throw new Error(result.error || "Kaydetme başarısız");
+        console.log("CLIENT DEBUG: handleSave called for slug:", selectedSlug);
+        console.log("CLIENT DEBUG: blocks to save:", updatedBlocks);
+
+        try {
+            const result = await savePageContent(selectedSlug, updatedBlocks);
+            console.log("CLIENT DEBUG: Server response:", result);
+
+            if (!result.success) {
+                console.error("CLIENT DEBUG: Save failed with error:", result.error);
+                throw new Error(result.error || "Kaydetme başarısız");
+            } else {
+                console.log("CLIENT DEBUG: Save successful!");
+            }
+        } catch (error) {
+            console.error("CLIENT DEBUG: Exception in handleSave:", error);
+            throw error;
         }
     };
 
@@ -61,38 +80,6 @@ export default function PageBuilderPage() {
 
     return (
         <div className="flex flex-col h-screen">
-            {/* Top Navigation */}
-            <div className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-4">
-                <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    {/* Back Button */}
-                    <Link
-                        href="/admin"
-                        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-[#ed2630] transition-colors"
-                    >
-                        <span className="material-symbols-outlined">arrow_back</span>
-                        <span className="font-medium">Admin Paneli</span>
-                    </Link>
-
-                    {/* Page Selector */}
-                    <div className="w-80">
-                        <PageSelector
-                            selectedSlug={selectedSlug}
-                            onSelectPage={setSelectedSlug}
-                        />
-                    </div>
-
-                    {/* Preview Button */}
-                    <Link
-                        href={`/${selectedSlug}`}
-                        target="_blank"
-                        className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-[#46474A] dark:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                    >
-                        <span className="material-symbols-outlined">visibility</span>
-                        <span className="font-medium">Önizle</span>
-                    </Link>
-                </div>
-            </div>
-
             {/* Page Builder */}
             <div className="flex-1 overflow-hidden">
                 <PageBuilderLayout
@@ -100,6 +87,15 @@ export default function PageBuilderPage() {
                     initialBlocks={blocks}
                     onSave={handleSave}
                     pageSlug={selectedSlug}
+                    stageNumber={stageOrder}
+                    headerContent={
+                        <div className="w-80">
+                            <PageSelector
+                                selectedSlug={selectedSlug}
+                                onSelectPage={setSelectedSlug}
+                            />
+                        </div>
+                    }
                 />
             </div>
         </div>

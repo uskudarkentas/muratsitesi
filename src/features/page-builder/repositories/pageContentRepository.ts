@@ -60,15 +60,27 @@ export class PageContentRepository extends BaseRepository<
         return prismaData;
     }
 
-    /**
-     * Find page content by slug
-     */
     async findBySlug(slug: string): Promise<PageContent | null> {
         try {
             const pageContent = await db.pageContent.findUnique({
                 where: { slug },
             });
-            return pageContent ? this.toDomain(pageContent) : null;
+
+            if (!pageContent) return null;
+
+            const domainModel = this.toDomain(pageContent);
+
+            // Fetch stage order if it exists
+            const stage = await db.stage.findUnique({
+                where: { slug },
+                select: { sequenceOrder: true }
+            });
+
+            if (stage) {
+                domainModel.stageOrder = stage.sequenceOrder;
+            }
+
+            return domainModel;
         } catch (error) {
             throw new DatabaseError('Failed to find page content by slug', error as Error);
         }

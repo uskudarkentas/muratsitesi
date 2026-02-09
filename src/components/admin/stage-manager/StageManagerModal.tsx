@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Article, CheckCircle, Clock } from "@phosphor-icons/react";
-import { updateStage, createStage } from "@/actions/admin";
+import { updateStage, createStage } from "@/server/actions/stageActions";
 
 interface StageManagerModalProps {
     isOpen: boolean;
@@ -77,6 +77,13 @@ export function StageManagerModal({
                 : (insertAfterOrder !== undefined
                     ? (nextOrder !== undefined ? (insertAfterOrder + nextOrder) / 2 : insertAfterOrder + 1)
                     : 1);
+
+            console.log("DEBUG StageManagerModal:", {
+                insertAfterOrder,
+                nextOrder,
+                targetOrder,
+                editStage: !!editStage
+            });
 
             if (status === 'LOCKED' && targetOrder < activeStageOrder) {
                 setValidationError('Gelecek aşamayı seçtiniz lütfen yerini değiştirin.');
@@ -163,6 +170,18 @@ export function StageManagerModal({
                                         onChange={(e) => setTitle(e.target.value)}
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#ed2630] focus:border-transparent outline-none transition-all"
                                         placeholder="Örn: Yıkım Başlangıcı"
+                                    />
+                                </div>
+
+                                {/* Description */}
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-sm font-bold text-slate-700">Açıklama</label>
+                                    <textarea
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#ed2630] focus:border-transparent outline-none transition-all resize-none"
+                                        placeholder="Aşama hakkında kısa açıklama"
+                                        rows={3}
                                     />
                                 </div>
 

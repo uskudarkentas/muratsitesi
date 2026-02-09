@@ -12,12 +12,16 @@ interface PageBuilderLayoutProps {
     initialBlocks: ContentBlock[];
     onSave: (blocks: ContentBlock[]) => Promise<void>;
     pageSlug: string;
+    headerContent?: React.ReactNode;
+    stageNumber?: number;
 }
 
 export function PageBuilderLayout({
     initialBlocks,
     onSave,
     pageSlug,
+    headerContent,
+    stageNumber,
 }: PageBuilderLayoutProps) {
     const [blocks, setBlocks] = useState<ContentBlock[]>(initialBlocks);
     const [isSaving, setIsSaving] = useState(false);
@@ -70,7 +74,7 @@ export function PageBuilderLayout({
         const index = blocks.findIndex((b) => b.id === blockId);
         if (index < blocks.length - 1) {
             const newBlocks = [...blocks];
-            [newBlocks[index + 1], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
+            [newBlocks[index], newBlocks[index + 1]] = [newBlocks[index + 1], newBlocks[index]];
             newBlocks.forEach((block, i) => { block.order = i; });
             setBlocks(newBlocks);
         }
@@ -123,14 +127,18 @@ export function PageBuilderLayout({
                         <Link href="/admin" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500">
                             <span className="material-symbols-outlined">arrow_back</span>
                         </Link>
-                        <div>
-                            <h1 className="text-xl font-bold text-[#46474A] dark:text-white">
-                                Sayfa Düzenleyici
-                            </h1>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                {pageSlug}
-                            </p>
-                        </div>
+                        {headerContent ? (
+                            headerContent
+                        ) : (
+                            <div>
+                                <h1 className="text-xl font-bold text-[#46474A] dark:text-white">
+                                    Sayfa Düzenleyici
+                                </h1>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {pageSlug}
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -221,6 +229,8 @@ export function PageBuilderLayout({
                                             onUpdateBlock={handleUpdateBlock}
                                             isFirst={index === 0}
                                             isLast={index === blocks.length - 1}
+                                            pageSlug={pageSlug}
+                                            stageNumber={stageNumber}
                                         />
                                     </motion.div>
                                 ))}
@@ -296,7 +306,7 @@ function createDefaultBlock(type: BlockType, order: number): ContentBlock {
                 type: 'text',
                 order,
                 data: {
-                    content: '<p>Metin içeriği buraya gelecek</p>',
+                    content: '<p>Buraya metin giriniz...</p>',
                 },
             };
 

@@ -62,78 +62,80 @@ export function InfoCardGrid({ block, isEditing = false, onUpdate }: InfoCardGri
     };
 
     return (
-        <section className="w-full py-8 bg-transparent">
+        <section className="w-full py-2 md:py-4 bg-transparent">
             <div className="container mx-auto px-4">
-                <div className={`grid grid-cols-1 ${gridColsClass} gap-6 md:gap-8`}>
-                    {cards.map((card, index) => {
-                        // Determine Icon Component
-                        const IconComponent = IconMap[card.icon] || IconMap['Circle'];
+                <div className="max-w-7xl mx-auto">
+                    <div className={`grid grid-cols-1 ${gridColsClass} gap-6 md:gap-8`}>
+                        {cards.map((card, index) => {
+                            // Determine Icon Component
+                            const IconComponent = IconMap[card.icon] || IconMap['Circle'];
 
-                        return (
-                            <div
-                                key={card.id}
-                                className="group relative bg-white dark:bg-slate-800 rounded-[2rem] p-8 md:p-10 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-700 h-full flex flex-col"
-                            >
-                                {/* Icon Area */}
-                                <div className="relative mb-8 flex-shrink-0">
-                                    <div
-                                        onClick={() => isEditing && setActiveIconPicker(activeIconPicker === index ? null : index)}
-                                        className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-700 text-slate-600 transition-colors ${isEditing ? 'cursor-pointer hover:bg-slate-100 hover:ring-2 hover:ring-[#ed2630] hover:text-[#ed2630]' : 'group-hover:bg-[#ed2630]/10 group-hover:text-[#ed2630]'}`}
-                                    >
-                                        {IconComponent && <IconComponent weight="duotone" className="w-8 h-8" />}
+                            return (
+                                <div
+                                    key={card.id}
+                                    className="group relative bg-white dark:bg-slate-800 rounded-[2rem] p-8 md:p-10 transition-all duration-300 border border-slate-100 dark:border-slate-700 h-full flex flex-col"
+                                >
+                                    {/* Icon Area */}
+                                    <div className="relative mb-6 flex-shrink-0">
+                                        <div
+                                            onClick={() => isEditing && setActiveIconPicker(activeIconPicker === index ? null : index)}
+                                            className={`flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-700 text-slate-600 transition-colors ${isEditing ? 'cursor-pointer hover:bg-slate-100 hover:ring-2 hover:ring-[#ed2630] hover:text-[#ed2630]' : 'group-hover:bg-[#ed2630]/10 group-hover:text-[#ed2630]'}`}
+                                        >
+                                            {IconComponent && <IconComponent weight="duotone" className="w-9 h-9" />}
 
-                                        {/* Edit Badge */}
-                                        {isEditing && (
-                                            <div className="absolute -top-2 -right-2 bg-white p-1 rounded-full shadow-md border border-slate-200">
-                                                <span className="material-symbols-outlined !text-[10px] text-slate-400">edit</span>
-                                            </div>
+                                            {/* Edit Badge */}
+                                            {isEditing && (
+                                                <div className="absolute -top-2 -right-2 bg-white p-1 rounded-full shadow-md border border-slate-200">
+                                                    <span className="material-symbols-outlined !text-[10px] text-slate-400">edit</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Icon Picker Popover */}
+                                        <div className="absolute top-full left-0 z-50">
+                                            <IconPicker
+                                                isOpen={activeIconPicker === index}
+                                                onClose={() => setActiveIconPicker(null)}
+                                                currentIcon={card.icon}
+                                                onSelect={(newIcon) => handleCardUpdate(index, 'icon', newIcon)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Title with Red Accent Line */}
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <span className="w-1 h-6 bg-[#ed2630] rounded-full flex-shrink-0 mt-1"></span>
+                                        {isEditing ? (
+                                            <InlineText
+                                                value={card.title}
+                                                onSave={(val) => handleCardUpdate(index, 'title', val)}
+                                                tagName="h3"
+                                                className="text-xl font-bold text-[#1a1b1f] dark:text-white leading-tight"
+                                            />
+                                        ) : (
+                                            <h3 className="text-xl font-bold text-[#1a1b1f] dark:text-white leading-tight">
+                                                {card.title}
+                                            </h3>
                                         )}
                                     </div>
 
-                                    {/* Icon Picker Popover */}
-                                    <div className="absolute top-full left-0 z-50">
-                                        <IconPicker
-                                            isOpen={activeIconPicker === index}
-                                            onClose={() => setActiveIconPicker(null)}
-                                            currentIcon={card.icon}
-                                            onSelect={(newIcon) => handleCardUpdate(index, 'icon', newIcon)}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Title with Red Accent Line */}
-                                <div className="flex items-center gap-3 mb-4">
-                                    <span className="w-1 h-6 bg-[#ed2630] rounded-full"></span>
+                                    {/* Description */}
                                     {isEditing ? (
                                         <InlineText
-                                            value={card.title}
-                                            onSave={(val) => handleCardUpdate(index, 'title', val)}
-                                            tagName="h3"
-                                            className="text-xl font-bold text-[#1a1b1f] dark:text-white"
+                                            value={card.description}
+                                            onSave={(val) => handleCardUpdate(index, 'description', val)}
+                                            tagName="p"
+                                            className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base"
                                         />
                                     ) : (
-                                        <h3 className="text-xl font-bold text-[#1a1b1f] dark:text-white">
-                                            {card.title}
-                                        </h3>
+                                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                                            {card.description}
+                                        </p>
                                     )}
                                 </div>
-
-                                {/* Description */}
-                                {isEditing ? (
-                                    <InlineText
-                                        value={card.description}
-                                        onSave={(val) => handleCardUpdate(index, 'description', val)}
-                                        tagName="p"
-                                        className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm md:text-base"
-                                    />
-                                ) : (
-                                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm md:text-base">
-                                        {card.description}
-                                    </p>
-                                )}
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </section>

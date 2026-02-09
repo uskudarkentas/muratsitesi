@@ -14,6 +14,10 @@ interface EditableBlockWrapperProps {
     onUpdateBlock: (updatedBlock: ContentBlock) => void;
     isFirst: boolean;
     isLast: boolean;
+    isFirst: boolean;
+    isLast: boolean;
+    pageSlug: string;
+    stageNumber?: number;
 }
 
 export function EditableBlockWrapper({
@@ -25,6 +29,8 @@ export function EditableBlockWrapper({
     onUpdateBlock,
     isFirst,
     isLast,
+    pageSlug,
+    stageNumber,
 }: EditableBlockWrapperProps) {
     const [isHovered, setIsHovered] = useState(false);
 
@@ -93,7 +99,7 @@ export function EditableBlockWrapper({
 
             {/* Block Content - Enable editing mode and pass update handler */}
             <div className={isHovered ? "opacity-100 blur-[0.2px] transition-all" : ""}>
-                <BlockRenderer block={block} isEditing={true} onUpdate={handleInlineUpdate} />
+                <BlockRenderer block={block} isEditing={true} onUpdate={handleInlineUpdate} pageSlug={pageSlug} stageNumber={stageNumber} />
             </div>
         </div>
     );

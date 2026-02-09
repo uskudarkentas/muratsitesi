@@ -198,12 +198,12 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                 </div>
             </div>
 
-            {/* Desktop "Finish Editing" Button - Positioned relative to Sidebar */}
+            {/* Desktop "Finish Editing" Button - Positioned on the right side */}
             {isStructureMode && (
-                <div className="fixed top-28 lg:left-[calc(20rem+2rem)] z-[40] hidden lg:block">
+                <div className="fixed top-28 right-8 z-[40] hidden lg:block">
                     <button
                         onClick={() => setIsStructureMode(false)}
-                        className={`flex items-center gap-2 p-2 rounded-lg shadow-sm backdrop-blur border transition-colors w-fit bg-[#ed2630] text-white border-[#ed2630]`}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg backdrop-blur border transition-colors w-fit bg-[#98EB94] text-slate-800 border-[#98EB94] hover:bg-[#7dd979]"
                     >
                         <span className="material-symbols-outlined">check</span>
                         <span className="font-bold text-sm">Düzenlemeyi Bitir</span>

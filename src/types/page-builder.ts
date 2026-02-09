@@ -102,5 +102,7 @@ export interface PageContentData {
     blocks: ContentBlock[];
     isTemplate: boolean;
     updatedAt: Date;
+    updatedAt: Date;
     createdAt: Date;
+    stageOrder?: number;
 }

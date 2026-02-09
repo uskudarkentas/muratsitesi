@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/core/database/client";
-import { ActionType } from "@prisma/client";
+import { ActionType } from "@/shared/types/analytics";
 
 /**
  * Track an analytics event

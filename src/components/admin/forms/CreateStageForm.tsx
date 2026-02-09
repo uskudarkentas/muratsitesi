@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createStage } from "@/actions/admin";
+import { createStage } from "@/server/actions/stageActions";
 
 interface CreateStageFormProps {
     onClose: () => void;
@@ -39,7 +39,7 @@ export function CreateStageForm({ onClose, onSuccess, insertPosition }: CreateSt
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-+|-+$/g, "");
 
-            await createStage({
+            const result = await createStage({
                 title: stageTitle,
                 slug,
                 description: stageDescription,
@@ -49,9 +49,15 @@ export function CreateStageForm({ onClose, onSuccess, insertPosition }: CreateSt
                 status: stageStatus as any,
             });
 
-            onSuccess();
+            if (result.success) {
+                onSuccess();
+            } else {
+                console.error("Failed to create stage:", result.error);
+                alert("Aşama oluşturulamadı: " + result.error);
+            }
         } catch (error) {
             console.error("Error creating stage:", error);
+            alert("Bir hata oluştu.");
         } finally {
             setIsSubmitting(false);
         }
@@ -123,8 +129,8 @@ export function CreateStageForm({ onClose, onSuccess, insertPosition }: CreateSt
                             key={icon}
                             onClick={() => setStageIcon(icon)}
                             className={`size-12 rounded-lg border-2 flex items-center justify-center transition-all ${stageIcon === icon
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border hover:border-primary/50"
+                                ? "border-primary bg-primary/10"
+                                : "border-border hover:border-primary/50"
                                 }`}
                         >
                             <span className="material-symbols-outlined !text-xl">{icon}</span>

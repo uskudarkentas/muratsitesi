@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllPages } from "@/actions/page-content";
+import { getAllPages } from "@/server/actions/pageBuilderActions";
 
 interface PageOption {
     slug: string;

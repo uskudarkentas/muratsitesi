@@ -1,6 +1,6 @@
 import { getLatestAnnouncement, getAnnouncementPreview } from "@/lib/mockData";
 import { trackAnalytics } from "@/actions/analytics";
-import { ActionType } from "@prisma/client";
+import { ActionType } from "@/shared/types/analytics";
 
 export function useStageShare() {
     const handleShare = async (stage: any) => {

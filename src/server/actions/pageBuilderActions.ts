@@ -33,8 +33,12 @@ export async function getPageContent(slug: string) {
  * Save page content
  */
 export async function savePageContent(slug: string, blocks: any[]) {
+    console.log(`SERVER ACTION: savePageContent called for slug '${slug}'`);
+    console.log(`SERVER ACTION: received blocks count: ${blocks?.length}`);
+
     try {
         const content = await pageBuilderService.savePageContent(slug, blocks);
+        console.log(`SERVER ACTION: Service returned content id: ${content.id}`);
 
         revalidatePath(`/asamalar/${slug}`);
         revalidatePath("/admin/page-builder");
@@ -44,7 +48,7 @@ export async function savePageContent(slug: string, blocks: any[]) {
             data: content.toJSON(),
         };
     } catch (error: any) {
-        console.error("Error saving page content:", error);
+        console.error("SERVER ACTION: Error saving page content:", error);
         return {
             success: false,
             error: error.message || "Failed to save page content",
@@ -128,6 +132,43 @@ export async function duplicatePage(sourceSlug: string, targetSlug: string) {
         return {
             success: false,
             error: error.message || "Failed to duplicate page",
+        };
+    }
+}
+
+/**
+ * Get all pages (static + dynamic stages) for PageSelector
+ */
+export async function getAllPages() {
+    try {
+        const { stageService } = await import("@/features/stages/services/stageService");
+
+        // 2. Get all stages using Service (Architecture Compliance)
+        const stages = await stageService.getAllStages();
+
+        // Combine them
+        const defaultPages = [
+            { slug: 'home', label: 'Ana Sayfa', description: 'Site ana sayfası' },
+            { slug: 'contact', label: 'İletişim', description: 'İletişim sayfası' },
+            { slug: 'risk-notice', label: 'Riskli Yapı İlanı', description: 'Riskli yapı ilanı sayfası' },
+        ];
+
+        const stagePages = stages.map(stage => ({
+            slug: stage.slug,
+            label: stage.title,
+            description: stage.description || 'Proje aşaması'
+        }));
+
+        return {
+            success: true,
+            data: [...defaultPages, ...stagePages],
+        };
+    } catch (error: any) {
+        console.error("Error getting all pages:", error);
+        return {
+            success: false,
+            error: error.message || "Failed to get all pages",
+            data: [],
         };
     }
 }

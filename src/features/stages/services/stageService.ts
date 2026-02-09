@@ -83,7 +83,35 @@ export class StageService extends BaseService<Stage, StageRepository> {
             throw new ConflictError(`Stage with slug "${data.slug}" already exists`);
         }
 
-        // Create stage
+        // If status is ACTIVE, handle cascade updates in transaction
+        if (data.status === StageStatus.ACTIVE) {
+            return this.repository.transaction(async () => {
+                // Update stages before target to COMPLETED
+                await this.repository.updateBeforeSequence(data.sequenceOrder, {
+                    status: StageStatus.COMPLETED,
+                } as Partial<Stage>);
+
+                // Update stages after target to LOCKED
+                await this.repository.updateAfterSequence(data.sequenceOrder, {
+                    status: StageStatus.LOCKED,
+                } as Partial<Stage>);
+
+                // Create the new active stage
+                return this.repository.create({
+                    title: data.title,
+                    slug: data.slug,
+                    description: data.description || null,
+                    iconKey: data.iconKey,
+                    variant: data.variant || 'default',
+                    sequenceOrder: data.sequenceOrder,
+                    status: StageStatus.ACTIVE,
+                    isVisible: data.isVisible ?? true,
+                    content: null,
+                });
+            });
+        }
+
+        // Normal creation (LOCKED or COMPLETED without cascade, usually LOCKED)
         return this.repository.create({
             title: data.title,
             slug: data.slug,

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { trackAnalytics } from "@/actions/analytics";
 import { usePathname } from "next/navigation";
-import { ActionType } from "@prisma/client";
+import { ActionType } from "@/shared/types/analytics";
 
 /**
  * Client component that tracks page views

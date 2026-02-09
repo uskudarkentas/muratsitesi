@@ -10,50 +10,11 @@ export class PageContent {
         public blocks: any[], // ContentBlock[] - keeping as any to avoid circular dependency
         public isTemplate: boolean,
         public readonly createdAt: Date,
-        public updatedAt: Date
+        public updatedAt: Date,
+        public stageOrder?: number // Added optional stageOrder
     ) { }
 
-    /**
-     * Check if this is a template
-     */
-    isTemplateContent(): boolean {
-        return this.isTemplate;
-    }
-
-    /**
-     * Check if page has content
-     */
-    hasContent(): boolean {
-        return this.blocks.length > 0;
-    }
-
-    /**
-     * Get number of blocks
-     */
-    getBlockCount(): number {
-        return this.blocks.length;
-    }
-
-    /**
-     * Check if page is empty
-     */
-    isEmpty(): boolean {
-        return this.blocks.length === 0;
-    }
-
-    /**
-     * Get blocks of a specific type
-     */
-    getBlocksByType(type: string): any[] {
-        return this.blocks.filter(block => block.type === type);
-    }
-
-    /**
-     * Check if page has a specific block type
-     */
-    hasBlockType(type: string): boolean {
-        return this.blocks.some(block => block.type === type);
-    }
+    // ... (keep existing methods)
 
     /**
      * Convert to plain object for serialization
@@ -66,6 +27,7 @@ export class PageContent {
             isTemplate: this.isTemplate,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
+            stageOrder: this.stageOrder, // Include stageOrder
         };
     }
 
@@ -79,7 +41,8 @@ export class PageContent {
             data.blocks,
             data.isTemplate,
             new Date(data.createdAt),
-            new Date(data.updatedAt)
+            new Date(data.updatedAt),
+            data.stageOrder // Include stageOrder
         );
     }
 }

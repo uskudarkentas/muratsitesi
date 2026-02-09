@@ -46,9 +46,9 @@ export function AnnouncementBanner({ block, isEditing = false, onUpdate }: Annou
     }
 
     return (
-        <section className="w-full py-8 md:py-12">
+        <section className="w-full py-4 md:py-6">
             <div className="container mx-auto px-4">
-                <div className="relative overflow-hidden rounded-[2.5rem] bg-white shadow-xl border border-slate-100 p-0 flex flex-col md:flex-row min-h-[180px]">
+                <div className="relative overflow-hidden rounded-[2rem] bg-white border border-slate-100 p-0 flex flex-col md:flex-row min-h-[180px] max-w-7xl mx-auto">
 
                     {/* Green Left Accent / Icon Area */}
                     <div className="relative w-full md:w-48 bg-[#a8f0a4] flex items-center justify-center p-8 md:p-0">

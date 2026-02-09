@@ -11,15 +11,17 @@ interface BlockRendererProps {
     block: ContentBlock;
     isEditing?: boolean;
     onUpdate?: (newData: any) => void;
+    pageSlug?: string;
+    stageNumber?: number;
 }
 
-export function BlockRenderer({ block, isEditing = false, onUpdate }: BlockRendererProps) {
+export function BlockRenderer({ block, isEditing = false, onUpdate, pageSlug, stageNumber }: BlockRendererProps) {
 
     if (!block) return null;
 
     switch (block.type) {
         case 'hero':
-            return <HeroSection block={block} isEditing={isEditing} onUpdate={onUpdate} />;
+            return <HeroSection block={block} isEditing={isEditing} onUpdate={onUpdate} pageSlug={pageSlug} stageNumber={stageNumber} />;
 
         case 'info-card-grid':
             return <InfoCardGrid block={block} isEditing={isEditing} onUpdate={onUpdate} />;

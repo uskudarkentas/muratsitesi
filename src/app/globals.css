@@ -153,13 +153,15 @@
     @apply leading-relaxed;
   }
 
-  /* Hide scrollbar utility */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  /* Global Hide Scrollbar - applied to everything as per user request */
+  * {
+    -ms-overflow-style: none !important;
+    /* IE and Edge */
+    scrollbar-width: none !important;
+    /* Firefox */
   }
 
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  *::-webkit-scrollbar {
+    display: none !important;
   }
 }

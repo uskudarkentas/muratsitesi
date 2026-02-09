@@ -68,6 +68,7 @@ export async function createStage(data: {
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
+        revalidatePath("/admin/page-builder");
 
         return {
             success: true,
@@ -103,6 +104,7 @@ export async function updateStage(
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
+        revalidatePath("/admin/page-builder");
 
         return {
             success: true,
@@ -127,6 +129,7 @@ export async function deleteStage(id: number) {
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
+        revalidatePath("/admin/page-builder");
 
         return { success: true };
     } catch (error: any) {
@@ -148,6 +151,7 @@ export async function reorderStages(stageIds: number[]) {
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
+        revalidatePath("/admin/page-builder");
 
         return { success: true };
     } catch (error: any) {
@@ -169,6 +173,7 @@ export async function toggleStageVisibility(id: number) {
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
+        revalidatePath("/admin/page-builder");
 
         return {
             success: true,

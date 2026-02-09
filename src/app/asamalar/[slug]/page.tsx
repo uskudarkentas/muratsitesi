@@ -5,13 +5,19 @@ import { BlockRenderer } from "@/components/page-builder/BlockRenderer";
 import Footer from "@/components/Footer";
 import { ContentBlock } from "@/types/page-builder";
 
-// Force dynamic rendering to handle new stages immediately
+// Force dynamic rendering
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
-export default async function StagePage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
 
-    // Fetch page content using new server action
+export default async function StagePage(props: PageProps) {
+    const params = await props.params;
+    const slug = params.slug;
+
+    // Fetch page content
     const result = await getPageContent(slug);
 
     if (!result.success || !result.data) {
@@ -25,12 +31,7 @@ export default async function StagePage({ params }: { params: Promise<{ slug: st
             <Header />
 
             <div className="flex-1 w-full pt-12">
-                {/* 
-                    New Block Renderer 
-                    - Uses the same components as the editor
-                    - Handles modern layouts (Hero, InfoCardGrid, etc.)
-                 */}
-                {blocks && (Array.isArray(blocks)) && (
+                {blocks && Array.isArray(blocks) && (
                     <div className="flex flex-col gap-6">
                         {(blocks as ContentBlock[]).map((block, index) => (
                             <div key={block.id || index}>
