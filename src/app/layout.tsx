@@ -26,6 +26,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col`}
+        suppressHydrationWarning={true}
       >
         {children}
       </body>

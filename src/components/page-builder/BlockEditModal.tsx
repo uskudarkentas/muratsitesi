@@ -94,6 +94,37 @@ export function BlockEditModal({ isOpen, onClose, onSave, block }: BlockEditModa
                         </div>
                         <InputField label="Başlık" value={formData.title} onChange={(v) => handleChange('title', v)} />
                         <TextAreaField label="Açıklama" value={formData.description} onChange={(v) => handleChange('description', v)} />
+
+                        <div className="border-t border-slate-100 pt-4 mt-4 space-y-4">
+                            <h4 className="text-sm font-bold text-slate-900">Medya ve Dosyalar</h4>
+
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Görsel (Opsiyonel)</label>
+                                <FileUploadField
+                                    value={formData.imageUrl}
+                                    onChange={(url) => handleChange('imageUrl', url)}
+                                    accept="image/*"
+                                    label="Görsel Yükle"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Dosya / PDF (Opsiyonel)</label>
+                                <FileUploadField
+                                    value={formData.attachmentUrl}
+                                    onChange={(url) => handleChange('attachmentUrl', url)}
+                                    accept=".pdf,.doc,.docx"
+                                    label="Dosya Yükle"
+                                />
+                            </div>
+
+                            <InputField
+                                label="Buton Metni (Eğer dosya varsa)"
+                                value={formData.attachmentText}
+                                onChange={(v) => handleChange('attachmentText', v)}
+                                placeholder="Örn: Dokümanı İndir"
+                            />
+                        </div>
                     </div>
                 );
 

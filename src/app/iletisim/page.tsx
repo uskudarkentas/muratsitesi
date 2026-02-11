@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Force dynamic rendering to fix build-time DB access issues
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
     title: "İletişim | Merkez Kentsel Dönüşüm Bilgilendirme Ofisi",
     description: "Üsküdar Merkez Kentsel Dönüşüm Bilgilendirme Ofisi iletişim bilgileri. Adres, telefon, e-posta ve çözüm hattı.",

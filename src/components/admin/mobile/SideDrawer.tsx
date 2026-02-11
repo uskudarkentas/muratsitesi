@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Gear, User, SignOut, Question } from "@phosphor-icons/react";
+import { X, Gear, User, SignOut, Question, ChartBar } from "@phosphor-icons/react";
 import Link from "next/link";
 
 interface SideDrawerProps {
@@ -63,39 +63,93 @@ export function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
                         {/* Menu Items */}
                         <div className="p-4">
-                            <nav className="space-y-1">
-                                <Link
-                                    href="/admin/profile"
-                                    onClick={onClose}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
-                                >
-                                    <User weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
-                                    <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
-                                        Profil
-                                    </span>
-                                </Link>
+                            <nav className="space-y-6">
+                                {/* GENEL BAKIŞ */}
+                                <div>
+                                    <h3 className="px-4 text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-2">
+                                        GENEL BAKIŞ
+                                    </h3>
+                                    <Link
+                                        href="/admin"
+                                        onClick={onClose}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                    >
+                                        <div className="w-5 h-5 flex items-center justify-center">
+                                            <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                        </div>
+                                        <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                            Kontrol Paneli
+                                        </span>
+                                    </Link>
+                                </div>
 
-                                <Link
-                                    href="/admin/settings"
-                                    onClick={onClose}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
-                                >
-                                    <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
-                                    <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
-                                        Ayarlar
-                                    </span>
-                                </Link>
+                                {/* ANALİZLER */}
+                                <div>
+                                    <h3 className="px-4 text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-2">
+                                        ANALİZLER
+                                    </h3>
+                                    <div className="space-y-1">
+                                        <Link
+                                            href="/admin/analytics/announcements"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <ChartBar weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Duyuru Analizleri
+                                            </span>
+                                        </Link>
+                                        <Link
+                                            href="/admin/analytics/meetings"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <User weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Toplantı Analizleri
+                                            </span>
+                                        </Link>
+                                        <Link
+                                            href="/admin/analytics/surveys"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <Question weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Anket Analizleri
+                                            </span>
+                                        </Link>
+                                    </div>
+                                </div>
 
-                                <Link
-                                    href="/admin/help"
-                                    onClick={onClose}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
-                                >
-                                    <Question weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
-                                    <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
-                                        Yardım
-                                    </span>
-                                </Link>
+                                {/* YAPILANDIRMA */}
+                                <div>
+                                    <h3 className="px-4 text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-2">
+                                        YAPILANDIRMA
+                                    </h3>
+                                    <div className="space-y-1">
+                                        <Link
+                                            href="/admin/timeline"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Süreç Yönetimi
+                                            </span>
+                                        </Link>
+                                        <Link
+                                            href="/admin/page-builder"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Sayfa Tasarımı
+                                            </span>
+                                        </Link>
+                                    </div>
+                                </div>
 
                                 <div className="pt-4 mt-4 border-t border-slate-100">
                                     <Link

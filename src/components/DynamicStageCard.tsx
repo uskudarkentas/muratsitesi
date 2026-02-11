@@ -14,6 +14,8 @@ interface PostData {
     content: any;
     type: "ANNOUNCEMENT" | "MEETING" | "SURVEY";
     publishedAt: Date | null;
+    imageUrl?: string | null;
+    attachmentUrl?: string | null;
 }
 
 // Debounce helper
@@ -88,6 +90,71 @@ export function DynamicStageCard({ stageId }: { stageId: number }) {
 
     const config = TYPE_CONFIG[post.type] || TYPE_CONFIG.ANNOUNCEMENT;
 
+    // Normalize content for RichTextRenderer
+    // The DB might contain raw text (from simple form) or JSON string (from editor)
+    // We also need to inject the `imageUrl` as an image block if it exists
+    const getNormalizedContent = () => {
+        let blocks: any[] = [];
+        const rawContent = post.content;
+        const postId = post.id; // Use post ID to namespace static blocks
+
+        // 1. Add Image Block if imageUrl exists
+        if (post.imageUrl) {
+            blocks.push({
+                id: `main-image-${postId}`,
+                type: 'image',
+                data: {
+                    file: { url: post.imageUrl },
+                    caption: '', // Could use title?
+                    withBorder: false,
+                    withBackground: false,
+                    stretched: false
+                }
+            });
+        }
+
+        // 2. Add Content
+        if (rawContent) {
+            try {
+                // Try to parse as JSON (Editor.js output)
+                const parsed = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;
+
+                if (parsed && Array.isArray(parsed.blocks)) {
+                    // Ensure every block has an ID and avoid collisions
+                    const parsedBlocks = parsed.blocks.map((b: any, index: number) => ({
+                        ...b,
+                        id: b.id || `block-${postId}-${index}`
+                    }));
+                    blocks = [...blocks, ...parsedBlocks];
+                } else if (typeof parsed === 'object' && parsed.blocks && Array.isArray(parsed.blocks)) {
+                    // Handle { time, blocks, version } structure
+                    const parsedBlocks = parsed.blocks.map((b: any, index: number) => ({
+                        ...b,
+                        id: b.id || `block-${postId}-${index}`
+                    }));
+                    blocks = [...blocks, ...parsedBlocks];
+                } else {
+                    // Not a block structure, treat as plain text
+                    throw new Error("Not a block structure");
+                }
+            } catch (e) {
+                // Determine if it was a JSON parse error or our custom error
+                // If parse error or "Not a block structure", treat as plain text paragraph
+                blocks.push({
+                    id: `main-text-${postId}`,
+                    type: 'paragraph',
+                    data: {
+                        text: String(rawContent).replace(/\n/g, '<br/>') // Basic formatting
+                    }
+                });
+            }
+        }
+
+        return { blocks };
+    };
+
+    const normalizedContent = getNormalizedContent();
+
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-left">
             <div className="mb-4">
@@ -111,8 +178,8 @@ export function DynamicStageCard({ stageId }: { stageId: number }) {
                 </span>
             </div>
 
-            <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                <RichTextRenderer content={post.content} />
+            <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                <RichTextRenderer content={normalizedContent} />
             </div>
         </div>
     );

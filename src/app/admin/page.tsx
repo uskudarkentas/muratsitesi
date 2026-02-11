@@ -1,8 +1,10 @@
+"use client";
+
 import { AdminSidebar } from "@/components/admin/dashboard/AdminSidebar";
-import { DashboardHeader } from "@/components/admin/dashboard/DashboardHeader";
-import { DashboardStats } from "@/components/admin/dashboard/DashboardStats";
-import { QuickActions } from "@/components/admin/dashboard/QuickActions";
-import { RecentActivity } from "@/components/admin/dashboard/RecentActivity";
+import { TransformationStatus } from "@/components/admin/dashboard/TransformationStatus";
+import { DashboardMetrics } from "@/components/admin/dashboard/DashboardMetrics";
+import { SystemActivityChart } from "@/components/admin/dashboard/SystemActivityChart";
+import { RecentActivityList } from "@/components/admin/dashboard/RecentActivityList";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { MobileNavigation } from "@/components/admin/mobile/MobileNavigation";
 
@@ -10,61 +12,39 @@ export default function AdminDashboardPage() {
     return (
         <>
             <PageViewTracker />
-            <div className="flex h-screen w-full overflow-hidden bg-background relative">
-                {/* Noise texture overlay - same as homepage */}
-                <div
-                    className="fixed inset-0 pointer-events-none opacity-[0.02] z-0"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
-                        backgroundRepeat: "repeat",
-                    }}
-                ></div>
-
-                {/* Sidebar - Hidden on mobile (md:flex) */}
+            <div className="flex h-screen w-full overflow-hidden bg-gray-50/50 relative font-sans">
+                {/* Sidebar */}
                 <AdminSidebar />
 
                 {/* Main Content Area */}
                 <div className="flex flex-1 flex-col overflow-y-auto relative">
-                    {/* Spotlight gradient - same as homepage */}
-                    <div className="absolute inset-0 flex justify-center pointer-events-none">
-                        <div
-                            className="w-full max-w-3xl h-full"
-                            style={{
-                                background:
-                                    "radial-gradient(circle at center, rgba(152, 235, 148, 0.05) 0%, transparent 70%)",
-                            }}
-                        ></div>
-                    </div>
+                    <main className="flex flex-1 flex-col gap-6 md:gap-8 p-6 md:p-10 max-w-[1600px] mx-auto w-full pb-24 md:pb-10">
+                        {/* Transformation Status (Hero) */}
+                        <section>
+                            <TransformationStatus />
+                        </section>
 
-                    <DashboardHeader />
+                        {/* Metrics Grid */}
+                        <section>
+                            <DashboardMetrics />
+                        </section>
 
-                    {/* Main content with bottom padding for mobile nav */}
-                    <main className="flex flex-1 flex-col gap-6 md:gap-8 p-4 md:p-10 lg:p-12 max-w-7xl mx-auto w-full pb-20 md:pb-6">
-                        {/* Page Heading - Match homepage typography */}
-                        <div className="flex flex-col gap-2">
-                            <h1 className="text-xl md:text-2xl font-bold text-[#46474A] tracking-tight">
-                                Hoşgeldiniz, Yönetici
-                            </h1>
-                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl">
-                                Site yönetim paneline genel bakış. Buradan duyuru
-                                yayınlayabilir, sakinleri bilgilendirebilir ve
-                                kentsel dönüşüm sürecini yönetebilirsiniz.
-                            </p>
-                        </div>
+                        {/* Charts & Activity */}
+                        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[450px]">
+                            {/* Main Chart - Takes 2 cols */}
+                            <div className="lg:col-span-2 h-[400px] lg:h-full">
+                                <SystemActivityChart />
+                            </div>
 
-                        {/* Stats Grid */}
-                        <DashboardStats />
-
-                        {/* Quick Actions (Main focus) */}
-                        <QuickActions />
-
-                        {/* Recent Activity - Full Width */}
-                        <RecentActivity />
+                            {/* Recent Activity - Takes 1 col */}
+                            <div className="lg:col-span-1 h-[400px] lg:h-full">
+                                <RecentActivityList />
+                            </div>
+                        </section>
                     </main>
                 </div>
             </div>
-
-            {/* Mobile Navigation (BottomNav + SideDrawer) */}
+            {/* Mobile Navigation */}
             <MobileNavigation />
         </>
     );

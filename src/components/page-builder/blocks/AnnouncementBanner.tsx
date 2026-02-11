@@ -48,10 +48,10 @@ export function AnnouncementBanner({ block, isEditing = false, onUpdate }: Annou
     return (
         <section className="w-full py-4 md:py-6">
             <div className="container mx-auto px-4">
-                <div className="relative overflow-hidden rounded-[2rem] bg-white border border-slate-100 p-0 flex flex-col md:flex-row min-h-[180px] max-w-7xl mx-auto">
+                <div className="relative overflow-hidden rounded-[2rem] bg-white border border-slate-100 p-0 flex flex-col md:flex-row min-h-[180px] max-w-7xl mx-auto shadow-sm">
 
                     {/* Green Left Accent / Icon Area */}
-                    <div className="relative w-full md:w-48 bg-[#a8f0a4] flex items-center justify-center p-8 md:p-0">
+                    <div className="relative w-full md:w-48 bg-[#a8f0a4] flex items-center justify-center p-8 md:p-0 flex-shrink-0">
                         <div className="relative">
                             <div
                                 onClick={() => isEditing && setIsPickerOpen(!isPickerOpen)}
@@ -85,35 +85,88 @@ export function AnnouncementBanner({ block, isEditing = false, onUpdate }: Annou
                     </div>
 
                     {/* Content Area */}
-                    <div className="flex-1 p-8 md:p-12 flex flex-col justify-center bg-gradient-to-r from-white via-white to-slate-50/50">
-                        <div className="flex items-center gap-3 mb-3">
-                            <span className="text-xs font-bold text-[#458a42] uppercase tracking-wider">ÖNEMLİ DUYURU</span>
+                    <div className="flex-1 p-6 md:p-10 flex flex-col md:flex-row gap-6 bg-gradient-to-r from-white via-white to-slate-50/50">
+
+                        {/* Text and Actions */}
+                        <div className="flex-1 flex flex-col justify-center">
+                            <div className="flex items-center gap-3 mb-3">
+                                <span className="text-xs font-bold text-[#458a42] uppercase tracking-wider">ÖNEMLİ DUYURU</span>
+                            </div>
+
+                            {isEditing ? (
+                                <InlineText
+                                    value={title}
+                                    onSave={(val) => handleUpdate('title', val)}
+                                    tagName="h3"
+                                    className="text-2xl md:text-3xl font-extrabold text-[#1a1b1f] mb-3"
+                                />
+                            ) : (
+                                <h3 className="text-2xl md:text-3xl font-extrabold text-[#1a1b1f] mb-3">
+                                    {title}
+                                </h3>
+                            )}
+
+                            {isEditing ? (
+                                <InlineText
+                                    value={description}
+                                    onSave={(val) => handleUpdate('description', val)}
+                                    tagName="p"
+                                    className="text-base text-gray-600 leading-relaxed max-w-2xl mb-6"
+                                />
+                            ) : (
+                                <p className="text-base text-gray-600 leading-relaxed max-w-2xl mb-6">
+                                    {description}
+                                </p>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-3">
+                                {/* Download Button */}
+                                {block.data.attachmentUrl && (
+                                    <a
+                                        href={block.data.attachmentUrl}
+                                        download
+                                        target="_blank"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#ed2630] text-white rounded-xl font-bold hover:bg-[#d11f2a] transition-all shadow-md hover:shadow-lg text-sm"
+                                    >
+                                        <span className="material-symbols-outlined !text-[20px]">download</span>
+                                        {block.data.attachmentText || "Dosyayı İndir"}
+                                    </a>
+                                )}
+
+                                {/* Share Button */}
+                                <button
+                                    onClick={() => {
+                                        if (navigator.share) {
+                                            navigator.share({
+                                                title: title,
+                                                text: description,
+                                                url: window.location.href
+                                            }).catch(console.error);
+                                        } else {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            alert("Bağlantı kopyalandı!");
+                                        }
+                                    }}
+                                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-all text-sm"
+                                >
+                                    <span className="material-symbols-outlined !text-[20px]">share</span>
+                                    Paylaş
+                                </button>
+                            </div>
                         </div>
 
-                        {isEditing ? (
-                            <InlineText
-                                value={title}
-                                onSave={(val) => handleUpdate('title', val)}
-                                tagName="h3"
-                                className="text-2xl md:text-3xl font-extrabold text-[#1a1b1f] mb-3"
-                            />
-                        ) : (
-                            <h3 className="text-2xl md:text-3xl font-extrabold text-[#1a1b1f] mb-3">
-                                {title}
-                            </h3>
-                        )}
-
-                        {isEditing ? (
-                            <InlineText
-                                value={description}
-                                onSave={(val) => handleUpdate('description', val)}
-                                tagName="p"
-                                className="text-base text-gray-600 leading-relaxed max-w-2xl"
-                            />
-                        ) : (
-                            <p className="text-base text-gray-600 leading-relaxed max-w-2xl">
-                                {description}
-                            </p>
+                        {/* Image Area (Right Side) */}
+                        {block.data.imageUrl && (
+                            <div className="w-full md:w-64 lg:w-80 flex-shrink-0">
+                                <div className="relative aspect-video md:aspect-square rounded-2xl overflow-hidden shadow-md border border-slate-100">
+                                    <img
+                                        src={block.data.imageUrl}
+                                        alt={title}
+                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                            </div>
                         )}
 
                     </div>

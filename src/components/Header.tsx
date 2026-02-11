@@ -5,15 +5,21 @@ import { HeaderNav } from "@/components/HeaderNav";
 
 export default async function Header() {
     // Fetch stages dynamically from database
-    const stages = await db.stage.findMany({
-        orderBy: { sequenceOrder: "asc" },
-        select: {
-            id: true,
-            title: true,
-            slug: true,
-            iconKey: true,
-        },
-    });
+    let stages = [];
+    try {
+        stages = await db.stage.findMany({
+            orderBy: { sequenceOrder: "asc" },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                iconKey: true,
+            },
+        });
+    } catch (error) {
+        console.warn("Failed to fetch stages in Header:", error);
+        // Continue with empty stages during build error
+    }
 
     return (
         <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-border bg-card px-6 lg:px-12 py-2 shadow-sm z-30 relative sticky top-0 pt-[env(safe-area-inset-top)]">

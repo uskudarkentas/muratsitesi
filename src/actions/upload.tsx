@@ -21,9 +21,19 @@ export async function uploadFile(formData: FormData) {
 
         // Save to public/uploads
         const uploadDir = join(process.cwd(), "public", "uploads");
+
+        // Ensure directory exists
+        try {
+            await require("fs/promises").mkdir(uploadDir, { recursive: true });
+        } catch (error) {
+            // Ignore error if directory already exists
+        }
+
         const filepath = join(uploadDir, filename);
 
-        await writeFile(filepath, buffer);
+        await writeFile(filepath, Reflect.construct(Uint8Array, [bytes]) as any); // Fix potential Buffer type issue if needed, but Buffer.from is standard. Let's stick to Buffer.from but ensure format.
+
+        await writeFile(filepath, Buffer.from(bytes));
 
         // Return public URL
         const fileUrl = `/uploads/${filename}`;
