@@ -4,9 +4,9 @@ export const MOCK_ACTIVITIES: Activity[] = [
     {
         id: 1,
         admin: {
-            name: "Ahmet Yılmaz",
+            name: "Özge Ayaz",
             role: "Yönetici",
-            initials: "AY",
+            initials: "ÖA",
             color: "bg-blue-100 text-blue-700"
         },
         action: "Yeni duyuru yayınladı",

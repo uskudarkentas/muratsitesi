@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Gear, User, SignOut, Question, ChartBar } from "@phosphor-icons/react";
+import { X, Gear, User, SignOut, Question, ChartBar, Globe } from "@phosphor-icons/react";
 import Link from "next/link";
+import { adminLogout } from "@/actions/auth";
 
 interface SideDrawerProps {
     isOpen: boolean;
@@ -45,18 +46,14 @@ export function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                         </div>
 
                         {/* Profile Section */}
-                        <div className="p-6 border-b border-slate-100">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ed2630] to-[#d11f2a] flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                                    AY
+                        <div className="p-4 border-t border-slate-100 bg-slate-50 mt-auto">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-[#ed2630] font-bold text-sm">
+                                    ÖA
                                 </div>
-                                <div>
-                                    <p className="font-bold tracking-tight text-slate-900">
-                                        Ahmet Yılmaz
-                                    </p>
-                                    <p className="text-sm text-slate-500 font-medium">
-                                        Yönetici
-                                    </p>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-slate-900">Özge Ayaz</span>
+                                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Yönetici</span>
                                 </div>
                             </div>
                         </div>
@@ -69,18 +66,33 @@ export function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                                     <h3 className="px-4 text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-2">
                                         GENEL BAKIŞ
                                     </h3>
-                                    <Link
-                                        href="/admin"
-                                        onClick={onClose}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
-                                    >
-                                        <div className="w-5 h-5 flex items-center justify-center">
-                                            <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
-                                        </div>
-                                        <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
-                                            Kontrol Paneli
-                                        </span>
-                                    </Link>
+                                    <div className="space-y-1">
+                                        <Link
+                                            href="/admin"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
+                                        >
+                                            <div className="w-5 h-5 flex items-center justify-center">
+                                                <Gear weight="light" className="w-5 h-5 text-slate-500 group-hover:text-[#ed2630] transition-colors" />
+                                            </div>
+                                            <span className="font-semibold tracking-tight text-slate-700 group-hover:text-slate-900">
+                                                Kontrol Paneli
+                                            </span>
+                                        </Link>
+                                        <Link
+                                            href="/"
+                                            target="_blank"
+                                            onClick={onClose}
+                                            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-sm"
+                                        >
+                                            <div className="w-5 h-5 flex items-center justify-center">
+                                                <Globe weight="bold" className="w-5 h-5" />
+                                            </div>
+                                            <span className="font-bold tracking-tight">
+                                                Siteyi Görüntüle
+                                            </span>
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 {/* ANALİZLER */}
@@ -152,16 +164,17 @@ export function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                                 </div>
 
                                 <div className="pt-4 mt-4 border-t border-slate-100">
-                                    <Link
-                                        href="/admin/logout"
-                                        onClick={onClose}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 transition-all text-red-600 group"
-                                    >
-                                        <SignOut weight="light" className="w-5 h-5" />
-                                        <span className="font-semibold tracking-tight">
-                                            Çıkış Yap
-                                        </span>
-                                    </Link>
+                                    <form action={adminLogout}>
+                                        <button
+                                            type="submit"
+                                            className="flex w-full items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 transition-all text-red-600 group"
+                                        >
+                                            <SignOut weight="light" className="w-5 h-5" />
+                                            <span className="font-semibold tracking-tight">
+                                                Çıkış Yap
+                                            </span>
+                                        </button>
+                                    </form>
                                 </div>
                             </nav>
                         </div>

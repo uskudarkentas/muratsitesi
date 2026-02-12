@@ -1,7 +1,4 @@
-
-import Header from "@/components/Header";
 import Timeline from "@/components/Timeline";
-import Footer from "@/components/Footer";
 import { TimelineProvider } from "@/context/TimelineContext";
 import { ProjectSummarySidebar } from "@/components/ProjectSummarySidebar";
 import { stageService } from "@/features/stages/services/stageService";
@@ -17,7 +14,7 @@ export default async function Home() {
   return (
     <TimelineProvider>
       <PageViewTracker />
-      <main className="flex h-screen flex-col bg-background relative overflow-hidden">
+      <div className="flex h-full flex-col bg-background relative overflow-hidden">
         {/* Noise texture overlay */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.02] z-0"
           style={{
@@ -26,7 +23,6 @@ export default async function Home() {
           }}>
         </div>
 
-        <Header />
         <div className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col no-scrollbar">
 
           {/* Project Summary - Fixed Left relative to Scroll Container */}
@@ -49,9 +45,8 @@ export default async function Home() {
               <Timeline stages={stages.map(s => s.toJSON()) as any} />
             </div>
           </div>
-          <Footer />
         </div>
-      </main >
+      </div >
     </TimelineProvider>
   );
 }

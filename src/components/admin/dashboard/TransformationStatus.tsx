@@ -1,7 +1,8 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { Building2, Hammer, CheckCircle2 } from "lucide-react";
+import { Building2, Hammer, CheckCircle2, Globe } from "lucide-react";
+import Link from "next/link";
 
 const data = [
     { name: "Tamamlanan", value: 45 },
@@ -45,9 +46,17 @@ export function TransformationStatus() {
 
                 <div className="flex flex-col">
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Dönüşüm Durumu</h2>
-                    <p className="text-gray-500 max-w-xs text-sm">
+                    <p className="text-gray-500 max-w-xs text-sm mb-4">
                         Kentsel dönüşüm sürecindeki genel ilerleme durumu ve bina istatistikleri.
                     </p>
+                    <Link
+                        href="/"
+                        target="_blank"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all w-fit shadow-sm"
+                    >
+                        <Globe size={16} />
+                        Siteyi Görüntüle
+                    </Link>
                 </div>
             </div>
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/core/database/client";
 import { HeaderNav } from "@/components/HeaderNav";
+import { cn } from "@/lib/utils";
 
 export default async function Header() {
     // Fetch stages dynamically from database
@@ -18,7 +19,6 @@ export default async function Header() {
         });
     } catch (error) {
         console.warn("Failed to fetch stages in Header:", error);
-        // Continue with empty stages during build error
     }
 
     return (
@@ -38,6 +38,7 @@ export default async function Header() {
             </div>
             <div className="flex items-center gap-8">
                 <HeaderNav stages={stages} />
+
                 <Link
                     href="/admin/login"
                     aria-label="Kullanıcı Girişi"
@@ -46,7 +47,8 @@ export default async function Header() {
                     <span className="material-symbols-outlined !text-[20px] text-muted-foreground group-hover:text-primary transition-colors">person</span>
                     <span className="text-sm font-medium group-hover:text-primary transition-colors">Giriş Yap</span>
                 </Link>
-                {/* Mobile only icon */}
+
+                {/* Mobile version */}
                 <Link
                     href="/admin/login"
                     aria-label="Kullanıcı Girişi"

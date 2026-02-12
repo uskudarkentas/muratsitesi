@@ -2,14 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-interface InlineTextProps {
-    value: string;
-    onSave: (newValue: string) => void;
-    className?: string;
-    tagName?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
-    placeholder?: string;
-}
-
 // List of default strings that should be auto-cleared on focus
 const AUTO_CLEAR_STRINGS = [
     "Başlık Buraya",
@@ -25,8 +17,24 @@ const AUTO_CLEAR_STRINGS = [
     "İndirilebilir Dokümanlar",
     "Metin içeriği buraya gelecek",
     "Başlık",
-    "Metin"
+    "Metin",
+    "Liste Başlığı",
+    "Liste maddesi 1",
+    "Liste maddesi 2",
+    "Liste maddesi 3"
 ];
+
+interface InlineTextProps {
+    value: string;
+    onSave: (newValue: string) => void;
+    className?: string;
+    tagName?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
+    placeholder?: string;
+    multiline?: boolean;
+    onKeyDown?: (e: React.KeyboardEvent) => void;
+    autoFocus?: boolean;
+    stripPastedNewlines?: boolean;
+}
 
 export function InlineText({
     value,
@@ -34,9 +42,20 @@ export function InlineText({
     className = "",
     tagName: Tag = "div",
     placeholder = "Metin girin...",
+    multiline = false,
+    onKeyDown,
+    autoFocus = false,
+    stripPastedNewlines = false,
 }: InlineTextProps) {
     const [isEditing, setIsEditing] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
+
+    // Initial AutoFocus
+    useEffect(() => {
+        if (autoFocus) {
+            setIsEditing(true);
+        }
+    }, [autoFocus]); // Run when autoFocus changes
 
     // Focus management
     useEffect(() => {
@@ -62,6 +81,16 @@ export function InlineText({
         }
     }, [isEditing, value]);
 
+    const handlePaste = (e: React.ClipboardEvent) => {
+        if (stripPastedNewlines) {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            // Replace newlines and carriage returns with a single space
+            const cleanText = text.replace(/[\r\n]+/g, ' ');
+            document.execCommand("insertText", false, cleanText);
+        }
+    };
+
     const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
         setIsEditing(false);
         const newValue = e.currentTarget.textContent || "";
@@ -75,7 +104,13 @@ export function InlineText({
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (onKeyDown) {
+            onKeyDown(e);
+        }
+
+        if (e.defaultPrevented) return;
+
+        if (e.key === "Enter" && !e.shiftKey && !multiline) {
             e.preventDefault();
             e.currentTarget.blur();
         }
@@ -90,6 +125,7 @@ export function InlineText({
                 className={`outline-none ring-2 ring-[#ed2630] ring-offset-2 rounded px-1 min-w-[50px] ${className}`}
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
             >
                 {value}
             </Tag>

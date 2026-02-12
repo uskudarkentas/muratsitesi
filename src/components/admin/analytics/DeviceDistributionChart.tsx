@@ -9,9 +9,12 @@ const data = [
     { name: "Tablet", value: 8 },
 ];
 
-const COLORS = ["#ef4444", "#374151", "#9ca3af"]; // Red, Charcoal, Gray
+interface DeviceDistributionChartProps {
+    color?: string;
+}
 
-export function DeviceDistributionChart() {
+export function DeviceDistributionChart({ color = "#ef4444" }: DeviceDistributionChartProps) {
+    const COLORS = [color, "#374151", "#9ca3af"]; // Dynamic primary, Charcoal, Gray
     return (
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-full flex flex-col">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Cihaz Dağılımı</h3>

@@ -32,17 +32,45 @@ function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue;
 }
 
-export function DynamicStageCard({ stageId }: { stageId: number }) {
-    const [post, setPost] = useState<PostData | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+export function DynamicStageCard({ stageId, initialPost }: { stageId: number; initialPost?: any }) {
+    const [post, setPost] = useState<PostData | null>(initialPost || null);
+    const [isLoading, setIsLoading] = useState(!initialPost);
 
     // Debounce the fetch to avoid spamming while spinning the wheel
     const debouncedStageId = useDebounce(stageId, 500);
 
+    // Update state if initialPost changes (e.g. parent updates)
     useEffect(() => {
+        if (initialPost) {
+            setPost(initialPost);
+            setIsLoading(false);
+        }
+    }, [initialPost]);
+
+    useEffect(() => {
+        // If we have an initial post and it matches the stageId, we might not need to fetch immediately
+        // But stageId prop might change while scrolling. 
+
+        // If initialPost is present and matches the current stage context, skip fetch? 
+        // Simpler: Just fetch if no post or if stageId changed and we don't have *that* stage's post.
+        // For now, let's allow fetching to ensure fresh data on stage change, 
+        // unless initialPost is provided AND matches the *debounced* stageId context (which is hard to know without ID check).
+
+        // Strategy: If `initialPost` is passed, we rely on it. If stageId changes, 
+        // the parent *should* pass the new initialPost. 
+        // However, DynamicStageCard is often used in a context where stageId changes rapidly (scrolling).
+
+        // If we are functioning as a "Static" card driven by parent (TimelineItem), 
+        // we might not even need the internal fetch logic if `initialPost` is always provided.
+        // But for backward compatibility with other usages, we keep the fetch.
+
+        if (initialPost && post?.id === initialPost.id) return; // Skip if we already have it from props
+
         let isMounted = true;
 
         async function fetchData() {
+            // Only fetch if we don't have valid data for this stageId
+            // OR if we want to support dynamic updates.
             setIsLoading(true);
             try {
                 const data = await getLatestStagePost(debouncedStageId);
@@ -58,12 +86,14 @@ export function DynamicStageCard({ stageId }: { stageId: number }) {
             }
         }
 
-        fetchData();
+        if (!initialPost) {
+            fetchData();
+        }
 
         return () => {
             isMounted = false;
         };
-    }, [debouncedStageId]);
+    }, [debouncedStageId, initialPost]);
 
     if (isLoading) {
         return <StageCardSkeleton />;

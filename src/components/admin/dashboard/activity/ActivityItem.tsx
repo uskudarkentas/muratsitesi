@@ -12,53 +12,64 @@ export function ActivityItem({ activity }: ActivityItemProps) {
 
     // Get status style configuration or fallback to default
     const statusStyle = ACTIVITY_STATUS_STYLES[activity.status] || DEFAULT_STATUS_STYLE;
-    const StatusIcon = statusStyle.icon;
 
     return (
-        <div className="group p-4 hover:bg-gray-50/40 transition-all duration-200 cursor-default">
-            <div className="flex items-start justify-between gap-4">
-                <div className="flex gap-4 min-w-0">
-                    {/* Avatar */}
+        <div className="group relative px-6 py-4 transition-all duration-300 cursor-default hover:bg-slate-50/50">
+            <div className="flex items-start gap-4">
+                {/* Timeline Node & Avatar */}
+                <div className="relative z-10 flex flex-col items-center">
                     <div className={cn(
-                        "h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 border-2 border-white shadow-sm",
-                        activity.admin.color
+                        "h-8 w-8 rounded-xl flex items-center justify-center text-[11px] font-bold shrink-0 border border-white shadow-sm transition-transform duration-300 group-hover:scale-110",
+                        activity.admin.color.replace('bg-', 'bg-').replace('text-', 'text-')
                     )}>
                         {activity.admin.initials}
                     </div>
+                </div>
 
-                    {/* Content */}
-                    <div className="flex flex-col min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm text-gray-600 font-normal">
-                                {activity.admin.name}
-                            </span>
-                            <span className="text-[10px] text-gray-300 font-normal">
-                                {activity.admin.role}
+                {/* Content */}
+                <div className="flex-1 min-w-0 pt-0.5">
+                    <div className="flex flex-col gap-1">
+                        {/* Main Action Line */}
+                        <div className="flex items-start justify-between gap-2">
+                            <h4 className="text-[14.5px] font-semibold text-gray-800 leading-snug tracking-tight">
+                                {activity.action}
+                                <span className="mx-2 text-gray-300 font-light">·</span>
+                                <span className="text-gray-900 font-bold decoration-gray-200/50 underline-offset-4 decoration-2">
+                                    {activity.target}
+                                </span>
+                            </h4>
+                            <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap pt-1">
+                                {activity.timestamp}
                             </span>
                         </div>
 
-                        <div className="text-sm text-gray-400 font-light mt-0.5 flex items-center gap-1.5 flex-wrap">
-                            <span>{activity.action}</span>
-                            <span className="text-sm font-medium text-gray-700 ml-0.5 flex items-center gap-1">
-                                — {activity.target}
-                                <TypeIcon size={14} strokeWidth={1.5} className="text-gray-400 ml-1" />
-                            </span>
+                        {/* Metadata & Status */}
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[12px] text-gray-500 font-medium">
+                                    {activity.admin.name}
+                                </span>
+                                <span className="w-1 h-3 border-l border-gray-200" />
+                                <span className="text-[11px] text-gray-400 font-normal">
+                                    {activity.admin.role}
+                                </span>
+                            </div>
+
+                            <span className="w-1 h-1 rounded-full bg-gray-200" />
+
+                            <div className="flex items-center gap-1.5">
+                                <div className={cn("w-1.5 h-1.5 rounded-full shadow-sm", statusStyle.dot)} />
+                                <span className={cn("text-[11px] font-bold uppercase tracking-wider", statusStyle.container.split(' ')[1])}>
+                                    {activity.status}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Side: Status & Time */}
-                <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <span className={cn(
-                        "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border bg-opacity-50 border-opacity-50",
-                        statusStyle.container
-                    )}>
-                        <StatusIcon size={10} strokeWidth={1.5} />
-                        {activity.status}
-                    </span>
-                    <span className="text-[10px] text-gray-300 font-normal">
-                        {activity.timestamp}
-                    </span>
+                {/* Subtle Icon on Hover */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 self-center">
+                    <TypeIcon size={16} strokeWidth={1.5} className="text-slate-300" />
                 </div>
             </div>
         </div>

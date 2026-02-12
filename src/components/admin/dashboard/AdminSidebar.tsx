@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
     LayoutDashboard,
+    Globe,
     Megaphone,
     Users,
     FileText,
@@ -14,6 +15,7 @@ import {
     LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { adminLogout } from "@/actions/auth";
 
 export function AdminSidebar() {
     const pathname = usePathname();
@@ -23,6 +25,7 @@ export function AdminSidebar() {
             label: "GENEL BAKIŞ",
             items: [
                 { label: "Kontrol Paneli", href: "/admin", icon: LayoutDashboard },
+                { label: "Siteyi Görüntüle", href: "/", icon: Globe, external: true },
             ]
         },
         {
@@ -104,20 +107,25 @@ export function AdminSidebar() {
                         <Settings size={18} className="text-gray-400" />
                         Ayarlar
                     </Link>
-                    <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors text-left">
-                        <LogOut size={18} className="text-gray-400" />
-                        Çıkış Yap
-                    </button>
+                    <form action={adminLogout}>
+                        <button
+                            type="submit"
+                            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors text-left"
+                        >
+                            <LogOut size={18} className="text-gray-400" />
+                            Çıkış Yap
+                        </button>
+                    </form>
                 </div>
 
                 {/* User Info (Mini) */}
                 <div className="mt-4 flex items-center gap-3 px-2 py-2">
                     <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#ed2630] to-[#f05058] flex items-center justify-center text-white text-xs font-bold shadow-sm">
-                        AY
+                        ÖA
                     </div>
                     <div className="flex flex-col min-w-0">
                         <span className="truncate text-xs font-semibold text-gray-900">
-                            Ahmet Yılmaz
+                            Özge Ayaz
                         </span>
                         <span className="truncate text-[10px] text-gray-500">
                             Yönetici

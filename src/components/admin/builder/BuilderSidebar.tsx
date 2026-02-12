@@ -23,11 +23,22 @@ export function BuilderSidebar({
             <div className="p-6 flex flex-col gap-6">
 
                 {/* Header / Back Button */}
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                    <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 hover:bg-[#ed2630]/10 text-slate-500 hover:text-[#ed2630] transition-colors">
-                        <ArrowLeft weight="bold" className="w-5 h-5" />
+                <div className="flex flex-col gap-4 pb-4 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                        <Link href="/admin" className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 hover:bg-[#ed2630]/10 text-slate-500 hover:text-[#ed2630] transition-colors">
+                            <ArrowLeft weight="bold" className="w-5 h-5" />
+                        </Link>
+                        <span className="font-bold text-slate-800 text-lg">İçerik Yönetimi</span>
+                    </div>
+
+                    <Link
+                        href="/"
+                        target="_blank"
+                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-sm group"
+                    >
+                        <span className="material-symbols-outlined !text-[18px]">open_in_new</span>
+                        Siteyi Görüntüle
                     </Link>
-                    <span className="font-bold text-slate-800 text-lg">İçerik Yönetimi</span>
                 </div>
 
                 <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-300">
@@ -63,7 +74,7 @@ export function BuilderSidebar({
                                 className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all group text-left"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
-                                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                                    <span className="w-3 h-3 rounded-full bg-purple-500"></span>
                                 </div>
                                 <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Toplantı Planla</span>
                             </button>
@@ -73,7 +84,7 @@ export function BuilderSidebar({
                                 className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 hover:shadow-sm transition-all group text-left"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center">
-                                    <span className="w-3 h-3 rounded-full bg-purple-500"></span>
+                                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
                                 </div>
                                 <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900">Etkinlik Duyurusu</span>
                             </button>

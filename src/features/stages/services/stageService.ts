@@ -2,6 +2,7 @@ import { BaseService } from '@/core/services/base.service';
 import { Stage, StageStatus } from '@/entities/stage/model';
 import { StageRepository, stageRepository } from '../repositories/stageRepository';
 import { NotFoundError, ValidationError, ConflictError } from '@/core/errors/AppError';
+import { db } from '@/core/database/client';
 
 /**
  * Stage Service
@@ -14,9 +15,6 @@ export class StageService extends BaseService<Stage, StageRepository> {
         super(repository);
     }
 
-    /**
-     * Get all stages ordered by sequence
-     */
     async getAllStages(): Promise<Stage[]> {
         return this.repository.findAllOrdered();
     }

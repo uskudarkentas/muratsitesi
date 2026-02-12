@@ -51,17 +51,25 @@ export function StageCard({
 
             {/* Dynamic Content for Desktop */}
             {variant === 'desktop' ? (
-                <DynamicStageCard key={stage.id} stageId={stage.id} />
+                <DynamicStageCard key={stage.id} stageId={stage.id} initialPost={stage.latestPost} />
             ) : (
                 // Mobile View (Simple Summary)
                 <>
                     <h3 className="text-xl font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        {stage.title}
+                        {stage.latestPost ? stage.latestPost.title : stage.title}
                     </h3>
 
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                        {description}
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed line-clamp-3">
+                        {stage.latestPost
+                            ? (stage.latestPost.content ? JSON.parse(stage.latestPost.content).blocks?.[0]?.data?.text : "Detaylar için tıklayınız.")
+                            : description}
                     </p>
+
+                    {stage.latestPost && (
+                        <span className="inline-block px-2 py-1 bg-gray-100 rounded text-xs text-gray-500 mb-2">
+                            {new Date(stage.latestPost.publishedAt || stage.latestPost.createdAt).toLocaleDateString('tr-TR')}
+                        </span>
+                    )}
                 </>
             )}
 

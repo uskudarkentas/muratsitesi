@@ -1,6 +1,5 @@
 import { Metadata } from "next";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+
 import {
     MapPin,
     Phone,
@@ -64,9 +63,7 @@ export default function ContactPage() {
     ];
 
     return (
-        <div className="flex h-screen flex-col bg-slate-50 font-sans overflow-hidden">
-            <Header />
-
+        <div className="flex h-full flex-col bg-slate-50 font-sans overflow-hidden">
             <div className="flex-1 overflow-y-auto w-full flex flex-col no-scrollbar">
                 <main className="flex-1 flex flex-col md:justify-center py-6 md:py-10">
 
@@ -220,7 +217,6 @@ export default function ContactPage() {
                         </div>
                     </div>
                 </main>
-                <Footer />
             </div>
         </div>
     );

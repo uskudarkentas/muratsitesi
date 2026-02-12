@@ -1,4 +1,4 @@
-export type ActivityType = "announcement" | "survey" | "user" | "pager" | "system" | "page";
+export type ActivityType = "announcement" | "meeting" | "survey" | "user" | "pager" | "system" | "page";
 
 export type ActivityStatus =
     | "Yayınlandı"

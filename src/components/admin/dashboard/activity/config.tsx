@@ -5,6 +5,7 @@ import { ActivityStatus, ActivityType } from "./types";
 
 export const ACTIVITY_TYPE_ICONS: Record<ActivityType, React.ElementType> = {
     announcement: Megaphone,
+    meeting: Clock, // Using Clock or Calendar
     survey: FileText,
     user: User,
     page: Layout,

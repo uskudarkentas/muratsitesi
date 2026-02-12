@@ -47,7 +47,7 @@ export class PostService extends BaseService<Post, PostRepository> {
     }
 
     /**
-     * Get upcoming events (meetings)
+     * Get upcoming events (meetings and surveys)
      */
     async getUpcomingEvents(): Promise<Post[]> {
         return this.repository.findUpcomingEvents();

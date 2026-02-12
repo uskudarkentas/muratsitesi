@@ -38,6 +38,8 @@ model Stage {
   iconKey       String      @map("icon_key")
   variant       String      @default("default") // default, small
   content       String?       // Block editor design content (JSON string)
+  progress      Int         @default(0) // Completion percentage (0-100)
+  autoPostTitle String?     @map("auto_post_title") // Default title for automated announcements
   
   posts         Post[]
 
@@ -55,6 +57,8 @@ model Post {
   isPublished Boolean  @default(false) @map("is_published")
   publishedAt DateTime? @map("published_at")
   eventDate   DateTime? @map("event_date")
+  expiresAt   DateTime? @map("expires_at") // For visibility expiration
+  viewCount   Int       @default(0) @map("view_count") // Analytics
   createdAt   DateTime @default(now()) @map("created_at")
 
   stage       Stage    @relation(fields: [stageId], references: [id])
@@ -80,6 +84,7 @@ model AnalyticsLog {
   id        String     @id @default(uuid())
   userId    String?    @map("user_id") // Nullable if tracking guests (though context says private)
   action    String
+  actionType String?   @map("action_type") // VIEW, CLICK, ACTION
   targetId  String?    @map("target_id") // Post ID or Stage ID
   ipAddress String?    @map("ip_address")
   timestamp DateTime   @default(now())

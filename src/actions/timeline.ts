@@ -35,7 +35,7 @@ export async function getFutureEvents() {
                     in: ["MEETING", "SURVEY"],
                 },
                 eventDate: {
-                    gte: new Date(new Date().setHours(0, 0, 0, 0)), // Include today until midnight
+                    gte: new Date(), // Disappear immediately after event time passes
                 },
             },
             orderBy: {

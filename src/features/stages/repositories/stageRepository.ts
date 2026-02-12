@@ -29,7 +29,7 @@ export class StageRepository extends BaseRepository<
      * Convert Prisma stage to domain model
      */
     protected toDomain(prismaStage: any): Stage {
-        return new Stage(
+        const stage = new Stage(
             prismaStage.id,
             prismaStage.title,
             prismaStage.slug,
@@ -41,6 +41,43 @@ export class StageRepository extends BaseRepository<
             prismaStage.variant,
             prismaStage.content
         );
+
+        // Map included posts if they exist
+        if (prismaStage.posts) {
+            // 1. Meetings (Purple Nodes)
+            stage.meetings = prismaStage.posts
+                .filter((p: any) => {
+                    if (p.type !== 'MEETING' || !p.isPublished) return false;
+                    if (!p.eventDate) return true; // Safety
+
+                    // Auto-Removal Logic: Only show meetings that are today or in the future
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return new Date(p.eventDate) >= today;
+                })
+                .sort((a: any, b: any) => {
+                    const dateA = a.eventDate ? new Date(a.eventDate).getTime() : 0;
+                    const dateB = b.eventDate ? new Date(b.eventDate).getTime() : 0;
+                    return dateA - dateB;
+                });
+
+            // 2. Latest Post (Persistent Card)
+            if (stage.status === StageStatus.ACTIVE) {
+                const sortedPosts = [...prismaStage.posts]
+                    .filter((p: any) => p.isPublished)
+                    .sort((a: any, b: any) => {
+                        const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+                        const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+                        return dateB - dateA;
+                    });
+
+                if (sortedPosts.length > 0) {
+                    stage.latestPost = sortedPosts[0];
+                }
+            }
+        }
+
+        return stage;
     }
 
     /**
@@ -63,12 +100,29 @@ export class StageRepository extends BaseRepository<
     }
 
     /**
+     * Find a single entity by ID with posts
+     */
+    async findById(id: number | string): Promise<Stage | null> {
+        try {
+            const stage = await db.stage.findUnique({
+                where: { id: Number(id) },
+                include: { posts: true }
+            });
+
+            return stage ? this.toDomain(stage) : null;
+        } catch (error) {
+            throw new DatabaseError('Failed to find stage by id', error as Error);
+        }
+    }
+
+    /**
      * Find stage by slug
      */
     async findBySlug(slug: string): Promise<Stage | null> {
         try {
             const stage = await db.stage.findUnique({
                 where: { slug },
+                include: { posts: true }
             });
             return stage ? this.toDomain(stage) : null;
         } catch (error) {
@@ -83,6 +137,7 @@ export class StageRepository extends BaseRepository<
         try {
             const stage = await db.stage.findFirst({
                 where: { status: StageStatus.ACTIVE },
+                include: { posts: true }
             });
             return stage ? this.toDomain(stage) : null;
         } catch (error) {
@@ -98,6 +153,7 @@ export class StageRepository extends BaseRepository<
             const stages = await db.stage.findMany({
                 where: { isVisible: true },
                 orderBy: { sequenceOrder: 'asc' },
+                include: { posts: true }
             });
             return stages.map(s => this.toDomain(s));
         } catch (error) {
@@ -112,6 +168,7 @@ export class StageRepository extends BaseRepository<
         try {
             const stages = await db.stage.findMany({
                 orderBy: { sequenceOrder: 'asc' },
+                include: { posts: true }
             });
             return stages.map(s => this.toDomain(s));
         } catch (error) {

@@ -11,6 +11,7 @@ import { useStepperWindow } from "@/hooks/useStepperWindow";
 import { useStageShare } from "@/hooks/useStageShare";
 import { TimelineItem } from "@/components/timeline/TimelineItem";
 import { TimelineMobileModal } from "@/components/timeline/TimelineMobileModal";
+import { MeetingDetailsModal } from "@/components/timeline/MeetingDetailsModal";
 import { StepperControls } from "@/components/timeline/StepperControls";
 
 // Define Stage interface matching DB/Prisma model roughly
@@ -24,6 +25,8 @@ interface StageData {
     sequenceOrder: number;
     isVisible: boolean;
     variant?: string;
+    latestPost?: any;
+    meetings?: any[];
 }
 
 interface TimelineProps {
@@ -42,6 +45,7 @@ export default function Timeline({ stages }: TimelineProps) {
     const { focusedIndex, handleScroll, scrollToIndex } = useTimelineScroll(containerRef, activeStageIndex);
     const { handleShare } = useStageShare();
     const [mobilePopupIndex, setMobilePopupIndex] = useState<number | null>(null);
+    const [selectedMeeting, setSelectedMeeting] = useState<any | null>(null);
 
     // Context for Sidebar/Content sync
     const { setFocusedStageId } = useTimelineContext();
@@ -123,6 +127,7 @@ export default function Timeline({ stages }: TimelineProps) {
                                 onScrollTo={() => scrollToIndex(index)}
                                 isVisible={isVisible}
                                 distanceFromActive={distanceFromActive}
+                                onMeetingClick={(meeting) => setSelectedMeeting(meeting)}
                             />
                         );
                     })}
@@ -136,6 +141,16 @@ export default function Timeline({ stages }: TimelineProps) {
                             onClose={() => setMobilePopupIndex(null)}
                             activeStageIndex={activeStageIndex}
                             onShare={handleShare}
+                        />
+                    )}
+                </AnimatePresence>
+
+                {/* Meeting Details Modal */}
+                <AnimatePresence>
+                    {selectedMeeting !== null && (
+                        <MeetingDetailsModal
+                            meeting={selectedMeeting}
+                            onClose={() => setSelectedMeeting(null)}
                         />
                     )}
                 </AnimatePresence>

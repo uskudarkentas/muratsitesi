@@ -69,7 +69,17 @@ export interface DocumentListBlock extends BaseBlock {
 export interface TextBlock extends BaseBlock {
     type: 'text';
     data: {
+        title?: string; // Added optional title
         content: string; // HTML or markdown
+    };
+}
+
+export interface ListBlock extends BaseBlock {
+    type: 'list';
+    data: {
+        title?: string;
+        items: string[];
+        listType?: 'disc' | 'decimal'; // 'disc' (bullet) or 'decimal' (numbered)
     };
 }
 
@@ -93,6 +103,7 @@ export type ContentBlock =
     | AnnouncementBannerBlock
     | DocumentListBlock
     | TextBlock
+    | ListBlock
     | ImageBlock
     | DividerBlock;
 

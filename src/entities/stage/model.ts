@@ -24,7 +24,9 @@ export class Stage {
         public isVisible: boolean,
         public iconKey: string,
         public variant: string,
-        public content: string | null
+        public content: string | null,
+        public latestPost: any | null = null, // Persistent card content (Active Stage)
+        public meetings: any[] = [] // Meeting nodes (Purple Stars)
     ) { }
 
     /**
@@ -108,6 +110,8 @@ export class Stage {
             iconKey: this.iconKey,
             variant: this.variant,
             content: this.content,
+            latestPost: this.latestPost,
+            meetings: this.meetings,
         };
     }
 
@@ -115,7 +119,7 @@ export class Stage {
      * Create from plain object
      */
     static fromJSON(data: any): Stage {
-        return new Stage(
+        const stage = new Stage(
             data.id,
             data.title,
             data.slug,
@@ -127,5 +131,12 @@ export class Stage {
             data.variant,
             data.content
         );
+        if (data.latestPost) {
+            stage.latestPost = data.latestPost;
+        }
+        if (data.meetings) {
+            stage.meetings = data.meetings;
+        }
+        return stage;
     }
 }

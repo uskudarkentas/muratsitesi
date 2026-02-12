@@ -4,6 +4,7 @@ import { InfoCardGrid } from "./blocks/InfoCardGrid";
 import { AnnouncementBanner } from "./blocks/AnnouncementBanner";
 import { DocumentList } from "./blocks/DocumentList";
 import { TextBlockComponent } from "./blocks/TextBlock";
+import { ListBlockComponent } from "./blocks/ListBlock";
 import { ImageBlockComponent } from "./blocks/ImageBlock";
 import { DividerBlock } from "./blocks/DividerBlock";
 
@@ -33,7 +34,10 @@ export function BlockRenderer({ block, isEditing = false, onUpdate, pageSlug, st
             return <DocumentList block={block} isEditing={isEditing} />;
 
         case 'text':
-            return <TextBlockComponent block={block} isEditing={isEditing} />;
+            return <TextBlockComponent block={block} isEditing={isEditing} onUpdate={onUpdate} />;
+
+        case 'list':
+            return <ListBlockComponent block={block} isEditing={isEditing} onUpdate={onUpdate} />;
 
         case 'image':
             return <ImageBlockComponent block={block} isEditing={isEditing} />;
@@ -42,6 +46,6 @@ export function BlockRenderer({ block, isEditing = false, onUpdate, pageSlug, st
             return <DividerBlock />;
 
         default:
-            return <div className="p-4 bg-red-50 text-red-500">Bilinmeyen blok tipi: {block.type}</div>;
+            return <div className="p-4 bg-red-50 text-red-500">Bilinmeyen blok tipi: {(block as any).type}</div>;
     }
 }

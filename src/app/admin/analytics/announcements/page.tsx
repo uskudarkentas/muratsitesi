@@ -8,6 +8,8 @@ import { AdminSidebar } from "@/components/admin/dashboard/AdminSidebar";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { MobileNavigation } from "@/components/admin/mobile/MobileNavigation";
 
+import { downloadDashboardAsPDF } from "@/lib/reportUtils";
+
 export default function AnalyticsDashboardPage() {
     return (
         <>
@@ -18,7 +20,7 @@ export default function AnalyticsDashboardPage() {
 
                 {/* Main Content Area */}
                 <div className="flex flex-1 flex-col overflow-y-auto relative">
-                    <main className="flex flex-1 flex-col gap-8 p-6 md:p-10 max-w-[1600px] mx-auto w-full pb-24 md:pb-10">
+                    <main id="analytics-report-content" className="flex flex-1 flex-col gap-8 p-6 md:p-10 max-w-[1600px] mx-auto w-full pb-24 md:pb-10">
                         {/* Header */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
@@ -30,12 +32,13 @@ export default function AnalyticsDashboardPage() {
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium shadow-sm hover:bg-gray-50 transition-colors">
+                                <button
+                                    onClick={() => downloadDashboardAsPDF('analytics-report-content', 'Duyuru_Analiz_Raporu')}
+                                    className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium shadow-sm hover:bg-gray-50 transition-colors"
+                                >
                                     Raporu İndir
                                 </button>
-                                <button className="px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium shadow-lg hover:bg-gray-800 transition-colors">
-                                    Yeni Kampanya
-                                </button>
+
                             </div>
                         </div>
 
@@ -48,12 +51,12 @@ export default function AnalyticsDashboardPage() {
                         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[400px]">
                             {/* Main Chart - Takes 2 cols */}
                             <div className="lg:col-span-2 h-[400px] lg:h-full">
-                                <EngagementChart />
+                                <EngagementChart color="#3b82f6" />
                             </div>
 
                             {/* Side Chart - Takes 1 col */}
                             <div className="lg:col-span-1 h-[300px] lg:h-full">
-                                <DeviceDistributionChart />
+                                <DeviceDistributionChart color="#3b82f6" />
                             </div>
                         </section>
 

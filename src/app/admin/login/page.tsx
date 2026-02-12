@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -145,7 +146,14 @@ export default function AdminLoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-border">
+                    <div className="mt-6 pt-6 border-t border-border flex flex-col gap-4">
+                        <Link
+                            href="/"
+                            className="flex items-center justify-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors font-medium"
+                        >
+                            <span className="material-symbols-outlined !text-[18px]">arrow_back</span>
+                            Siteye Dön
+                        </Link>
                         <p className="text-xs text-muted-foreground text-center">
                             Bu sayfa yalnızca yetkili yöneticiler içindir.
                         </p>

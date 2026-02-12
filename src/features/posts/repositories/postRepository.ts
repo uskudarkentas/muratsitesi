@@ -129,17 +129,23 @@ export class PostRepository extends BaseRepository<
     }
 
     /**
-     * Find upcoming events (meetings with future event dates)
+     * Find upcoming events (meetings and surveys with future dates)
      */
     async findUpcomingEvents(): Promise<Post[]> {
         try {
             const posts = await db.post.findMany({
                 where: {
-                    type: PostType.MEETING,
-                    eventDate: { gt: new Date() },
                     isPublished: true,
+                    type: { in: [PostType.MEETING, PostType.SURVEY] },
+                    OR: [
+                        { eventDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
+                        { expiresAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } }
+                    ]
                 },
-                orderBy: { eventDate: 'asc' },
+                orderBy: [
+                    { eventDate: 'asc' }, // Soonest events first
+                    { createdAt: 'desc' } // Fallback to newest created
+                ]
             });
             return posts.map(p => this.toDomain(p));
         } catch (error) {

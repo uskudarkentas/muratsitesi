@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Paperclip } from "@phosphor-icons/react";
-import { createPost } from "@/actions/admin";
+import { createPost, updatePost } from "@/actions/admin";
 import { TemplateChips } from "./TemplateChips";
 import { MobilePreview } from "./MobilePreview";
 
@@ -15,6 +15,14 @@ interface SimplifiedAnnouncementModalProps {
     stageId: number;
     initialType?: 'heading' | 'text' | 'image' | null;
     initialPostType?: 'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null;
+    editPost?: {
+        id: string;
+        title: string;
+        content: string;
+        type: string;
+        eventDate: string | null;
+        attachmentUrl: string | null;
+    } | null;
 }
 
 export function SimplifiedAnnouncementModal({
@@ -22,27 +30,55 @@ export function SimplifiedAnnouncementModal({
     onClose,
     stageId,
     initialType,
-    initialPostType
+    initialPostType,
+    editPost
 }: SimplifiedAnnouncementModalProps) {
     const router = useRouter();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [selectedType, setSelectedType] = useState<"ANNOUNCEMENT" | "MEETING" | "SURVEY">("ANNOUNCEMENT");
+    const [eventDate, setEventDate] = useState<string>("");
 
     useEffect(() => {
-        if (isOpen && initialType === 'heading') {
+        if (isOpen && editPost) {
+            setTitle(editPost.title);
+            // Parse content from JSON if it's stored that way
+            try {
+                const parsed = JSON.parse(editPost.content);
+                const text = parsed.blocks?.find((b: any) => b.type === 'paragraph')?.data?.text || "";
+                setContent(text);
+            } catch (e) {
+                setContent(editPost.content);
+            }
+            setSelectedType(editPost.type as any);
+            if (editPost.eventDate) {
+                // Format for datetime-local: YYYY-MM-DDTHH:MM
+                const date = new Date(editPost.eventDate);
+                const offset = date.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(date.getTime() - offset)).toISOString().slice(0, 16);
+                setEventDate(localISOTime);
+            } else {
+                setEventDate("");
+            }
+        } else if (isOpen && initialType === 'heading') {
             setTitle("Yeni Başlık");
+            setContent("");
+            setEventDate("");
         } else if (isOpen) {
             setTitle("");
             setContent("");
+            setEventDate("");
         }
 
-        if (isOpen && initialPostType) {
-            setSelectedType(initialPostType);
-        } else if (isOpen) {
-            setSelectedType("ANNOUNCEMENT");
+        if (!editPost) {
+            if (isOpen && initialPostType) {
+                setSelectedType(initialPostType);
+            } else if (isOpen) {
+                setSelectedType("ANNOUNCEMENT");
+            }
         }
-    }, [isOpen, initialType, initialPostType]);
+    }, [isOpen, initialType, initialPostType, editPost]);
+
     const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,9 +97,9 @@ export function SimplifiedAnnouncementModal({
         setIsSubmitting(true);
 
         try {
-            let fileUrl = "";
+            let fileUrl = editPost?.attachmentUrl || "";
 
-            // 1. Upload file if exists
+            // 1. Upload file if new one selected
             if (file) {
                 const formData = new FormData();
                 formData.append("file", file);
@@ -83,29 +119,36 @@ export function SimplifiedAnnouncementModal({
                 }
             }
 
-            // 2. Create Post
-            const result = await createPost({
-                stageId,
-                title,
-                content,
-                type: selectedType,
-                attachmentUrl: fileUrl, // Using attachmentUrl for generic files
-            });
+            // 2. Create or Update Post
+            let result;
+            if (editPost) {
+                result = await updatePost(editPost.id, {
+                    title,
+                    content,
+                    attachmentUrl: fileUrl,
+                    eventDate: eventDate ? new Date(eventDate) : undefined,
+                });
+            } else {
+                result = await createPost({
+                    stageId,
+                    title,
+                    content,
+                    type: selectedType,
+                    attachmentUrl: fileUrl,
+                    eventDate: eventDate ? new Date(eventDate) : undefined,
+                });
+            }
 
             if (!result.success) {
-                throw new Error(result.error || "Duyuru oluşturulamadı");
+                throw new Error((result as any).error || "İşlem başarısız");
             }
 
             // 3. Success Feedback
-            // Reset form
             setTitle("");
             setContent("");
             setFile(null);
             onClose();
             router.refresh();
-
-            // Optional: You could add a toast notification here
-            // toast.success("Duyuru başarıyla yayınlandı");
 
         } catch (error) {
             console.error("Submission error:", error);
@@ -204,6 +247,23 @@ export function SimplifiedAnnouncementModal({
                                             />
                                             <p className="text-xs text-slate-500 mt-1.5 font-medium">
                                                 {title.length}/100 karakter
+                                            </p>
+                                        </div>
+
+                                        {/* Date Field - Visible for all types now */}
+                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <label className="block text-sm font-semibold tracking-tight text-slate-700 mb-2">
+                                                {selectedType === 'MEETING' ? 'Toplantı Zamanı' : selectedType === 'SURVEY' ? 'Son Katılım Tarihi' : 'Etkinlik/Duyuru Tarihi'}
+                                            </label>
+                                            <input
+                                                type="datetime-local"
+                                                value={eventDate}
+                                                onChange={(e) => setEventDate(e.target.value)}
+                                                required={selectedType === 'MEETING'}
+                                                className="w-full px-4 py-3 rounded-xl border-0 bg-white text-slate-900 ring-1 ring-slate-200 focus:ring-1 focus:ring-slate-300 focus:bg-white transition-all shadow-sm"
+                                            />
+                                            <p className="text-xs text-slate-500 mt-1.5 font-medium">
+                                                {selectedType === 'MEETING' ? 'Toplantının gerçekleşeceği tarih' : selectedType === 'SURVEY' ? 'Anketin ne zamana kadar açık kalacağı' : 'Duyuru veya etkinliğin tarihi'}
                                             </p>
                                         </div>
 

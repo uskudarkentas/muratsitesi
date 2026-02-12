@@ -42,6 +42,12 @@ const blockTemplates: BlockTemplate[] = [
         description: 'Zengin metin içeriği',
     },
     {
+        type: 'list',
+        icon: 'format_list_bulleted',
+        label: 'Liste Bloğu',
+        description: 'Maddeli liste ve başlık',
+    },
+    {
         type: 'image',
         icon: 'photo',
         label: 'Görsel',

@@ -158,6 +158,12 @@ export async function updateStage(
                 prisma.stage.update({
                     where: { id },
                     data
+                }),
+                prisma.analyticsLog.create({
+                    data: {
+                        action: 'UPDATE_STAGE_CONTENT',
+                        targetId: `Aşama: ${id}`,
+                    }
                 })
             ]);
         } else if (data.status === StageStatus.COMPLETED) {
@@ -193,6 +199,12 @@ export async function updateStage(
                     prisma.stage.update({
                         where: { id },
                         data
+                    }),
+                    prisma.analyticsLog.create({
+                        data: {
+                            action: 'COMPLETE_STAGE',
+                            targetId: `Aşama: ${id}`,
+                        }
                     })
                 ]);
             } else {
@@ -304,47 +316,77 @@ export async function createEvent(data: {
     }
 }
 
-export async function updateEvent(
-    id: string, // Changed from number to string (UUID)
+// Note: We are consolidating event actions into post actions as they share the same model
+export async function updatePost(
+    id: string,
     data: {
         title?: string;
+        content?: string;
+        imageUrl?: string;
+        attachmentUrl?: string;
         eventDate?: Date;
-        description?: string;
     }
 ) {
     try {
-        const event = await prisma.post.update({
+        const post = await prisma.post.update({
             where: { id },
             data: {
-                title: data.title,
-                eventDate: data.eventDate,
-                content: data.description ? JSON.stringify({ blocks: [{ type: "paragraph", data: { text: data.description } }] }) : undefined,
+                ...data,
+                content: data.content ? JSON.stringify({ blocks: [{ type: "paragraph", data: { text: data.content } }] }) : undefined,
             },
+        });
+
+        // Track update
+        await prisma.analyticsLog.create({
+            data: {
+                action: 'UPDATE_POST',
+                targetId: data.title || 'İçerik',
+            }
         });
 
         revalidatePath("/");
         revalidatePath("/admin");
+        revalidatePath("/admin/timeline");
+        revalidatePath(`/asamalar/${post.stageId}`);
 
-        return { success: true, event };
+        return { success: true, post };
     } catch (error) {
-        console.error("Error updating event:", error);
-        return { success: false, error: "Etkinlik güncellenemedi" };
+        console.error("Error updating post:", error);
+        return { success: false, error: "İçerik güncellenemedi" };
     }
 }
 
-export async function deleteEvent(id: string) { // Changed from number to string (UUID)
+export async function deletePost(id: string) {
     try {
+        const post = await prisma.post.findUnique({
+            where: { id },
+        });
+
+        if (!post) {
+            return { success: false, error: "İçerik bulunamadı" };
+        }
+
         await prisma.post.delete({
             where: { id },
         });
 
+        // Track delete
+        await prisma.analyticsLog.create({
+            data: {
+                action: 'DELETE_POST',
+                targetId: post.title,
+            }
+        });
+
         revalidatePath("/");
         revalidatePath("/admin");
+        revalidatePath("/admin/timeline");
+        revalidatePath(`/asamalar/${post.stageId}`);
 
         return { success: true };
     } catch (error) {
-        console.error("Error deleting event:", error);
-        return { success: false, error: "Etkinlik silinemedi" };
+        console.error("Error deleting post:", error);
+        return { success: false, error: "İçerik silinemedi" };
     }
 }
 
@@ -359,6 +401,7 @@ export async function createPost(data: {
     type?: "ANNOUNCEMENT" | "MEETING" | "SURVEY";
     imageUrl?: string;
     attachmentUrl?: string;
+    eventDate?: Date;
 }) {
     try {
         const post = await prisma.post.create({
@@ -369,7 +412,18 @@ export async function createPost(data: {
                 type: data.type || "ANNOUNCEMENT",
                 imageUrl: data.imageUrl || null,
                 attachmentUrl: data.attachmentUrl || null,
+                eventDate: data.eventDate || (data.type === 'MEETING' ? new Date() : null),
+                isPublished: true,
+                publishedAt: new Date(),
             },
+        });
+
+        // Track creation
+        await prisma.analyticsLog.create({
+            data: {
+                action: `CREATE_POST_${data.type || 'ANNOUNCEMENT'}`,
+                targetId: data.title,
+            }
         });
 
         revalidatePath("/");
@@ -383,56 +437,8 @@ export async function createPost(data: {
     }
 }
 
-export async function updatePost(
-    id: number,
-    data: {
-        title?: string;
-        content?: string;
-        imageUrl?: string;
-        attachmentUrl?: string;
-    }
-) {
-    try {
-        const post = await prisma.post.update({
-            where: { id },
-            data,
-        });
+// Legacy actions replaced by consolidated updatePost/deletePost above
 
-        revalidatePath("/");
-        revalidatePath("/admin");
-        revalidatePath(`/asamalar/${post.stageId}`);
-
-        return { success: true, post };
-    } catch (error) {
-        console.error("Error updating post:", error);
-        return { success: false, error: "Duyuru güncellenemedi" };
-    }
-}
-
-export async function deletePost(id: number) {
-    try {
-        const post = await prisma.post.findUnique({
-            where: { id },
-        });
-
-        if (!post) {
-            return { success: false, error: "Duyuru bulunamadı" };
-        }
-
-        await prisma.post.delete({
-            where: { id },
-        });
-
-        revalidatePath("/");
-        revalidatePath("/admin");
-        revalidatePath(`/asamalar/${post.stageId}`);
-
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting post:", error);
-        return { success: false, error: "Duyuru silinemedi" };
-    }
-}
 
 // ============================================
 // UTILITY ACTIONS

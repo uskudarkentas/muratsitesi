@@ -321,6 +321,17 @@ function createDefaultBlock(type: BlockType, order: number): ContentBlock {
                 },
             };
 
+        case 'list':
+            return {
+                id,
+                type: 'list',
+                order,
+                data: {
+                    title: 'Liste Başlığı',
+                    items: ['Liste maddesi 1', 'Liste maddesi 2', 'Liste maddesi 3'],
+                },
+            };
+
         case 'divider':
             return {
                 id,

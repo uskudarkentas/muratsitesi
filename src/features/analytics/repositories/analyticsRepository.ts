@@ -9,6 +9,7 @@ export interface AnalyticsLog {
     id: string;
     userId: string | null;
     action: string;
+    actionType: string | null;
     targetId: string | null;
     ipAddress: string | null;
     timestamp: Date;
@@ -27,6 +28,7 @@ export class AnalyticsRepository {
     async log(data: {
         userId?: string;
         action: string;
+        actionType?: string;
         targetId?: string;
         ipAddress?: string;
     }): Promise<AnalyticsLog> {
@@ -35,6 +37,7 @@ export class AnalyticsRepository {
                 data: {
                     userId: data.userId || null,
                     action: data.action,
+                    actionType: data.actionType || null,
                     targetId: data.targetId || null,
                     ipAddress: data.ipAddress || null,
                 },
@@ -181,6 +184,7 @@ export class AnalyticsRepository {
             id: prismaLog.id,
             userId: prismaLog.userId,
             action: prismaLog.action,
+            actionType: prismaLog.actionType,
             targetId: prismaLog.targetId,
             ipAddress: prismaLog.ipAddress,
             timestamp: prismaLog.timestamp,
