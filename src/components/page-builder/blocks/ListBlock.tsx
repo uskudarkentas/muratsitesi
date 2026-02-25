@@ -1,6 +1,7 @@
 "use client";
 
 import { ListBlock } from "@/types/page-builder";
+import { RichText } from "../RichText";
 import { InlineText } from "../InlineText";
 
 interface ListBlockComponentProps {
@@ -58,10 +59,9 @@ export function ListBlockComponent({ block, isEditing = false, onUpdate }: ListB
     };
 
     const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleAddItem(index);
-        } else if (e.key === 'Backspace' && items[index] === '') {
+        // If it's a list, we let Enter be handled by InlineText (which allows newlines if multiline=true)
+        // We no longer add items on Enter, as the user prefers the + button.
+        if (e.key === 'Backspace' && items[index] === '') {
             e.preventDefault();
             handleRemoveItem(index);
         }
@@ -82,18 +82,18 @@ export function ListBlockComponent({ block, isEditing = false, onUpdate }: ListB
                                 <div className="flex-1 mr-4">
                                     {(title || isEditing) && (
                                         isEditing ? (
-                                            <InlineText
+                                            <RichText
                                                 value={title || ""}
                                                 placeholder="Liste Başlığı (İsteğe bağlı)"
                                                 onSave={handleUpdateTitle}
-                                                tagName="h3"
                                                 className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white"
                                             />
                                         ) : (
                                             title && (
-                                                <h3 className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white">
-                                                    {title}
-                                                </h3>
+                                                <div
+                                                    className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white"
+                                                    dangerouslySetInnerHTML={{ __html: title }}
+                                                />
                                             )
                                         )
                                     )}
@@ -133,16 +133,11 @@ export function ListBlockComponent({ block, isEditing = false, onUpdate }: ListB
                                         <div className="flex-1 min-w-0 relative">
                                             {isEditing ? (
                                                 <>
-                                                    <InlineText
+                                                    <RichText
                                                         value={item}
                                                         onSave={(val) => handleUpdateItem(index, val)}
-                                                        tagName="div"
-                                                        className="whitespace-pre-line outline-none w-full block text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-                                                        onKeyDown={(e) => handleKeyDown(e, index)}
-                                                        autoFocus={index === focusedIndex}
-                                                        multiline={true}
+                                                        className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed min-w-[50px]"
                                                         placeholder="Madde içeriği..."
-                                                        stripPastedNewlines={true}
                                                     />
                                                     <button
                                                         onClick={() => handleRemoveItem(index)}
@@ -153,9 +148,10 @@ export function ListBlockComponent({ block, isEditing = false, onUpdate }: ListB
                                                     </button>
                                                 </>
                                             ) : (
-                                                <div className="whitespace-pre-wrap text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                                                    {item}
-                                                </div>
+                                                <div
+                                                    className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap prose prose-slate max-w-none"
+                                                    dangerouslySetInnerHTML={{ __html: item }}
+                                                />
                                             )}
                                         </div>
                                     </div>

@@ -21,15 +21,15 @@ export function SystemActivityChart() {
     const data = useMemo(() => generateData(), []);
 
     return (
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm h-full flex flex-col">
-            <div className="mb-6 flex justify-between items-center">
+        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm h-full flex flex-col">
+            <div className="mb-3 flex justify-between items-center">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900">Genel Sistem Aktivitesi</h3>
                     <p className="text-sm text-gray-400 font-light">Son 30 günlük site etkileşimi</p>
                 </div>
             </div>
 
-            <div className="flex-1 w-full min-h-[300px]">
+            <div className="flex-1 w-full min-h-[250px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>

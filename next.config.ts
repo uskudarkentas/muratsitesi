@@ -12,20 +12,24 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.placehold.co', // Wildcard just in case
+        hostname: '*.placehold.co',
       },
       {
         protocol: 'https',
-        hostname: 'localhost', // For local https (rare but possible)
+        hostname: 'localhost',
       },
-      // If user is running on localhost without https, 'next/image' usually doesn't block local files if they are in /public, 
-      // but if served via absolute URL:
       {
         protocol: 'http',
         hostname: 'localhost',
       }
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
+
 };
 
 export default nextConfig;

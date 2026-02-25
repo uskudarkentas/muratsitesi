@@ -1,6 +1,9 @@
+"use client";
+
 import { HeroBlock } from "@/types/page-builder";
 import Image from "next/image";
 import { InlineText } from "../InlineText";
+import { RichText } from "../RichText";
 
 interface HeroSectionProps {
     block: HeroBlock;
@@ -20,8 +23,10 @@ export function HeroSection({ block, isEditing = false, onUpdate, pageSlug, stag
         }
     };
 
+    // Strip HTML for badge detection
+    const plainTitle = title.replace(/<[^>]*>/g, '').trim();
     // Logic to automatically handle "1. Aşama: Title" pattern (Priority 2)
-    const titleMatch = title.match(/^(\d+)\.\s*Aşama:\s*(.+)$/i);
+    const titleMatch = plainTitle.match(/^(\d+)\.\s*Aşama:\s*(.+)$/i);
 
     // Logic to derive stage from page slug (Priority 1)
     const getStageNumber = () => {
@@ -56,7 +61,7 @@ export function HeroSection({ block, isEditing = false, onUpdate, pageSlug, stag
     return (
         <section className="relative w-full overflow-hidden bg-slate-50 dark:bg-slate-900">
             {/* Main Container - Standardized minimal spacing */}
-            <div className="container mx-auto px-4 pt-4 pb-2 md:pt-6 md:pb-4">
+            <div className="container mx-auto px-4 pt-4 pb-1 md:pt-6 md:pb-2">
                 <div className="max-w-7xl mx-auto">
 
                     {/* 1. Header Area (Outside Card) */}
@@ -72,24 +77,26 @@ export function HeroSection({ block, isEditing = false, onUpdate, pageSlug, stag
                         {/* Title */}
                         {isEditing ? (
                             <div
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     if (title === 'Başlık Buraya' && onUpdate) {
                                         onUpdate({ ...block.data, title: '' });
                                     }
                                 }}
                                 className={title === 'Başlık Buraya' ? 'opacity-50' : ''}
                             >
-                                <InlineText
+                                <RichText
                                     value={title}
                                     onSave={(val) => handleUpdate('title', val)}
-                                    tagName="h1"
-                                    className="text-3xl md:text-5xl font-black text-[#1a1b1f] dark:text-white leading-tight tracking-tight min-h-[1.2em] outline-none"
+                                    className="text-3xl md:text-5xl font-black text-[#1a1b1f] dark:text-white leading-tight tracking-tight min-h-[1.2em]"
+                                    placeholder="Başlık Buraya"
                                 />
                             </div>
                         ) : (
-                            <h1 className="text-3xl md:text-5xl font-black text-[#1a1b1f] dark:text-white leading-tight tracking-tight">
-                                {displayTitle}
-                            </h1>
+                            <h1
+                                className="text-3xl md:text-5xl font-black text-[#1a1b1f] dark:text-white leading-tight tracking-tight"
+                                dangerouslySetInnerHTML={{ __html: titleMatch ? titleMatch[2] : title }}
+                            />
                         )}
                     </div>
 
@@ -112,7 +119,8 @@ export function HeroSection({ block, isEditing = false, onUpdate, pageSlug, stag
                             {/* Description */}
                             {isEditing ? (
                                 <div
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         const defaultDesc = 'Açıklama metni buraya gelecek. Kentsel dönüşüm süreci hakkında bilgi verin.';
                                         if ((!description || description === defaultDesc) && onUpdate) {
                                             onUpdate({ ...block.data, description: '' });
@@ -120,17 +128,17 @@ export function HeroSection({ block, isEditing = false, onUpdate, pageSlug, stag
                                     }}
                                     className={(!description || description === 'Açıklama metni buraya gelecek. Kentsel dönüşüm süreci hakkında bilgi verin.') ? 'opacity-50' : ''}
                                 >
-                                    <InlineText
+                                    <RichText
                                         value={description || 'Açıklama metni buraya gelecek. Kentsel dönüşüm süreci hakkında bilgi verin.'}
                                         onSave={(val) => handleUpdate('description', val)}
-                                        tagName="p"
-                                        className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed min-h-[1.5em] outline-none"
+                                        className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed"
                                     />
                                 </div>
                             ) : (
-                                <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    {description}
-                                </p>
+                                <div
+                                    className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed prose prose-lg dark:prose-invert max-w-none"
+                                    dangerouslySetInnerHTML={{ __html: description }}
+                                />
                             )}
                         </div>
                     </div>

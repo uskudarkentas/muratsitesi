@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ContentBlock } from "@/types/page-builder";
 import { BlockRenderer } from "./BlockRenderer";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
 
 interface EditableBlockWrapperProps {
     block: ContentBlock;
@@ -98,8 +100,18 @@ export function EditableBlockWrapper({
             </AnimatePresence>
 
             {/* Block Content - Enable editing mode and pass update handler */}
-            <div className={isHovered ? "opacity-100 blur-[0.2px] transition-all" : ""}>
+            <div
+                className={cn(
+                    "relative transition-all",
+                    isHovered ? "opacity-100 blur-[0.05px]" : ""
+                )}
+            >
                 <BlockRenderer block={block} isEditing={true} onUpdate={handleInlineUpdate} pageSlug={pageSlug} stageNumber={stageNumber} />
+
+                {/* Visual indicator that it's editable - subtle overlay */}
+                {isHovered && (
+                    <div className="absolute inset-0 z-[5] bg-[#ed2630]/[0.02] pointer-events-none rounded-2xl" />
+                )}
             </div>
         </div>
     );

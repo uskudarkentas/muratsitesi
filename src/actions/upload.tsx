@@ -1,46 +1,55 @@
 "use server";
 
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { revalidatePath } from "next/cache";
+
 
 export async function uploadFile(formData: FormData) {
     try {
         const file = formData.get("file") as File;
         if (!file) {
+            console.error("Upload error: No file in formData");
             return { success: false, error: "Dosya bulunamadı" };
         }
+
+        // Server-side guardrail: 30MB Max
+        const MAX_SIZE = 30 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            return { success: false, error: "Dosya boyutu çok büyük (Sınır: 30MB)" };
+        }
+
+        console.log(`Uploading file: ${file.name}, size: ${file.size} bytes`);
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
         // Create unique filename
         const timestamp = Date.now();
-        const originalName = file.name.replace(/[^a-zA-Z0-9.]/g, "_"); // Sanitize
-        const filename = `${timestamp}-${originalName}`;
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const filename = `${timestamp}-${sanitizedName}`;
 
         // Save to public/uploads
         const uploadDir = join(process.cwd(), "public", "uploads");
 
         // Ensure directory exists
         try {
-            await require("fs/promises").mkdir(uploadDir, { recursive: true });
-        } catch (error) {
-            // Ignore error if directory already exists
+            await mkdir(uploadDir, { recursive: true });
+        } catch (e) {
+            // Already exists or other error handled by writeFile later
         }
 
         const filepath = join(uploadDir, filename);
+        await writeFile(filepath, buffer);
 
-        await writeFile(filepath, Reflect.construct(Uint8Array, [bytes]) as any); // Fix potential Buffer type issue if needed, but Buffer.from is standard. Let's stick to Buffer.from but ensure format.
-
-        await writeFile(filepath, Buffer.from(bytes));
+        console.log(`File saved to: ${filepath}`);
 
         // Return public URL
         const fileUrl = `/uploads/${filename}`;
-
         return { success: true, url: fileUrl };
     } catch (error) {
-        console.error("Upload error:", error);
-        return { success: false, error: "Dosya yüklenirken bir hata oluştu" };
+        console.error("Upload server action error:", error);
+        return { success: false, error: "Sunucu tarafında bir hata oluştu" };
     }
 }
+

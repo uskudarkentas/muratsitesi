@@ -30,6 +30,40 @@ export function TimelineNode({
 }: TimelineNodeProps) {
     const isSmallVariant = stage.variant === 'small' || stage.slug === 'temsili-sozlesme';
 
+    // Check for specific color variants
+    const isGoldVariant = stage.slug === 'temsili-sozlesme';
+    const isGreenVariant = stage.slug === 'riskli-yapi-ilani';
+
+    // Helper to determine active color based on variant
+    const getActiveColorClass = (type: 'text' | 'bg' | 'border' | 'shadow' | 'ping') => {
+        if (isGoldVariant) {
+            switch (type) {
+                case 'text': return 'text-white';
+                case 'bg': return 'bg-[#FCD535]';
+                case 'border': return 'border-[#FCD535]';
+                case 'shadow': return 'shadow-[0_0_20px_rgba(252,213,53,0.6)]';
+                case 'ping': return 'bg-[#FCD535]/50';
+            }
+        }
+        if (isGreenVariant) {
+            switch (type) {
+                case 'text': return 'text-[#98EB94]';
+                case 'bg': return 'bg-[#98EB94]/20';
+                case 'border': return 'border-[#98EB94]';
+                case 'shadow': return 'shadow-[0_0_20px_rgba(152,235,148,0.4)]';
+                case 'ping': return 'bg-[#98EB94]/20';
+            }
+        }
+        // Default Red
+        switch (type) {
+            case 'text': return 'text-[#ed2630]';
+            case 'bg': return 'bg-[#ed2630]/20';
+            case 'border': return 'border-[#ed2630]';
+            case 'shadow': return 'shadow-[0_0_20px_rgba(237,38,48,0.4)]';
+            case 'ping': return 'bg-[#ed2630]/20';
+        }
+    };
+
     return (
         <motion.div
             animate={{
@@ -39,7 +73,7 @@ export function TimelineNode({
                 "relative flex items-center justify-center rounded-full transition-all duration-300 cursor-pointer group z-30",
                 isSmallVariant
                     ? "size-10" // Consistently match meeting node size
-                    : (isCurrent ? "size-20" : "size-16"), // Standard sizes
+                    : (isCurrent ? "size-20" : isPast ? "size-12" : "size-16"), // Smaller for past, standard for future
 
                 // Admin Future Visibility Override
                 isAdmin && isFuture && "!bg-slate-200 !border-slate-400 !text-slate-600 border-2 border-dashed shadow-none"
@@ -90,11 +124,13 @@ export function TimelineNode({
                 <>
                     <div className={cn(
                         "absolute inset-0 rounded-full animate-ping",
-                        isSmallVariant ? "bg-red-200" : "bg-[#98EB94]/20"
+                        isSmallVariant ? "bg-red-200" : getActiveColorClass('ping')
                     )}></div>
                     <div className={cn(
                         "absolute -inset-3 rounded-full border-4",
-                        isSmallVariant ? "border-red-200" : "border-[#98EB94]/20"
+                        isSmallVariant ? "border-red-200" :
+                            (isGoldVariant ? "border-[#FCD535]/50" :
+                                (isGreenVariant ? "border-[#34C759]/20" : "border-[#ed2630]/20"))
                     )}></div>
                 </>
             )}
@@ -103,14 +139,23 @@ export function TimelineNode({
             <div
                 className={cn(
                     "relative w-full h-full rounded-full flex items-center justify-center transition-all duration-300",
-                    // Base colors
-                    isPast && "bg-primary border-2 border-primary shadow-md",
-                    isCurrent && "bg-white dark:bg-gray-900 border-4 border-[#98EB94] shadow-[0_0_20px_rgba(152,235,148,0.4)]",
-                    isFuture && "bg-[#F2F2F7] border-2 border-[#F2F2F7]",
 
-                    // Overrides for 'small' variant (Temsili Sözleşme) - GOLD STYLE
-                    isSmallVariant && "!bg-[#FCD535] !border-none !shadow-sm", // Solid Yellow/Gold
-                    isSmallVariant && isCurrent && "shadow-[0_0_20px_rgba(252,213,53,0.6)] scale-110" // Gold glow if active
+                    // Base colors: Solid colors for past items (as requested: "daire kırmızı iconlar beyazdı")
+                    isPast && !isGoldVariant && !isGreenVariant && "bg-[#ed2630] border-2 border-[#ed2630] shadow-md",
+
+                    // Active State Logic: Pulsing and Highlighted
+                    (isCurrent || stage.status === 'ACTIVE') && !isGoldVariant && cn(
+                        "bg-white dark:bg-gray-900 border-4",
+                        getActiveColorClass('border'),
+                        getActiveColorClass('shadow')
+                    ),
+
+                    // Future State Logic: Gray for locked items that aren't past the active marker
+                    (isFuture && stage.status !== 'COMPLETED' && stage.status !== 'ACTIVE') && "bg-[#F2F2F7] border-2 border-[#F2F2F7]",
+
+                    // Overrides for Gold variants (Temsili Sözleşme)
+                    isGoldVariant && (isPast ? "bg-[#FCD535] border-2 border-[#FCD535]" : "!bg-[#FCD535] !border-none !shadow-sm"),
+                    isGoldVariant && (isCurrent || stage.status === 'ACTIVE') && "bg-white border-4 border-[#FCD535] shadow-[0_0_20px_rgba(252,213,53,0.8)] scale-110 shadow-gold/20"
                 )}
             >
                 <span className="relative z-10 flex items-center justify-center">
@@ -119,16 +164,20 @@ export function TimelineNode({
                             "material-symbols-outlined transition-all leading-none",
                             isSmallVariant
                                 ? "text-white text-lg" // specific size for small
-                                : (isCurrent ? "text-[#34C759] text-3xl" : (isFuture ? "text-slate-400 text-2xl" : "text-white text-2xl")),
-                            isCurrent && !isSmallVariant && "scale-110",
-                            isSmallVariant && "text-white" // ensure white icon on gold
+                                : (isCurrent || stage.status === 'ACTIVE'
+                                    ? `${getActiveColorClass('text')} text-3xl`
+                                    : (isPast || stage.status === 'COMPLETED')
+                                        ? "text-white text-xl"
+                                        : isFuture && stage.status !== 'COMPLETED' ? "text-slate-400 text-2xl" : "text-white text-2xl"),
+                            (isCurrent || stage.status === 'ACTIVE') && !isSmallVariant && "scale-110",
+                            isGoldVariant && !isPast && !isCurrent && "text-white" // solid gold items have white icons
                         )}
-                        style={isSmallVariant ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                        style={isGoldVariant ? { fontVariationSettings: "'FILL' 1" } : undefined}
                     >
                         {isSmallVariant ? 'star' : (stage.icon || stage.iconKey)}
                     </span>
                 </span>
             </div>
-        </motion.div>
+        </motion.div >
     );
 }

@@ -7,6 +7,7 @@ import { EditableBlockWrapper } from "./EditableBlockWrapper";
 import { BlockEditModal } from "./BlockEditModal";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { SaveStatusModal } from "./SaveStatusModal";
 
 interface PageBuilderLayoutProps {
     initialBlocks: ContentBlock[];
@@ -80,15 +81,30 @@ export function PageBuilderLayout({
         }
     };
 
+    const [saveStatus, setSaveStatus] = useState<{ isOpen: boolean; type: "success" | "error"; message: string }>({
+        isOpen: false,
+        type: "success",
+        message: "",
+    });
+
     // 6. Sayfayı Kaydetme (handlePageSave -> onSave prop)
     const handlePageSave = async () => {
         setIsSaving(true);
         try {
             await onSave(blocks);
-            alert('Sayfa başarıyla kaydedildi!');
+            // Show custom success modal instead of alert
+            setSaveStatus({
+                isOpen: true,
+                type: "success",
+                message: "Sayfa ve yapmış olduğunuz tüm değişiklikler başarıyla kaydedildi.",
+            });
         } catch (error) {
             console.error('Save error:', error);
-            alert('Kaydederken bir hata oluştu.');
+            setSaveStatus({
+                isOpen: true,
+                type: "error",
+                message: "Kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.",
+            });
         } finally {
             setIsSaving(false);
         }
@@ -103,7 +119,15 @@ export function PageBuilderLayout({
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950">
+        <div className="fixed inset-0 z-[60] flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+            {/* Save Success/Error Modal */}
+            <SaveStatusModal
+                isOpen={saveStatus.isOpen}
+                onClose={() => setSaveStatus(prev => ({ ...prev, isOpen: false }))}
+                type={saveStatus.type}
+                message={saveStatus.message}
+            />
+
             {/* Edit Modal */}
             {editingBlock && (
                 <BlockEditModal
@@ -122,7 +146,7 @@ export function PageBuilderLayout({
             {/* Main Canvas Area */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Top Bar */}
-                <div className="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between">
+                <div className="sticky top-0 z-20 flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-4">
                         <Link href="/admin" className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500">
                             <span className="material-symbols-outlined">arrow_back</span>
@@ -285,7 +309,8 @@ function createDefaultBlock(type: BlockType, order: number): ContentBlock {
                     icon: 'Megaphone',
                     title: 'Sitemiz İçin Hızlı Tarama',
                     description: 'Murat Sitesi bloklarında yapılacak hızlı tarama testleri için yönetime bildirimde bulunabilirsiniz.',
-                    backgroundColor: '#98EB94' // Success green
+                    backgroundColor: '#98EB94', // Success green
+                    layout: 'banner'
                 },
             };
 
@@ -321,6 +346,8 @@ function createDefaultBlock(type: BlockType, order: number): ContentBlock {
                 },
             };
 
+
+
         case 'list':
             return {
                 id,
@@ -338,6 +365,71 @@ function createDefaultBlock(type: BlockType, order: number): ContentBlock {
                 type: 'divider',
                 order,
                 data: {},
+            };
+
+        case 'document-preview':
+            return {
+                id,
+                type: 'document-preview',
+                order,
+                data: {
+                    url: 'https://placehold.co/800x1100', // A4-ish ratio
+                    title: 'Doküman Başlığı',
+                    description: 'Doküman hakkında kısa açıklama buraya gelecek.',
+                    buttonText: 'Belgeyi İncele'
+                },
+            };
+
+        case 'slider':
+            return {
+                id,
+                type: 'slider',
+                order,
+                data: {
+                    slides: [
+                        {
+                            id: `s1-${Date.now()}`,
+                            url: 'https://placehold.co/1200x600?text=S%C3%BCrg%C3%BC+1',
+                            title: 'Birinci Sürgü Başlığı',
+                            caption: 'Buraya kısa bir açıklama veya slogan gelebilir.'
+                        },
+                        {
+                            id: `s2-${Date.now()}`,
+                            url: 'https://placehold.co/1200x600?text=S%C3%BCrg%C3%BC+2',
+                            title: 'İkinci Sürgü Başlığı',
+                            caption: 'Sürdürülebilir dönüşüm projeleri ile geleceği inşa ediyoruz.'
+                        }
+                    ]
+                }
+            };
+
+
+        case 'video':
+            return {
+                id,
+                type: 'video',
+                order,
+                data: {
+                    url: '',
+                    title: 'Video Başlığı',
+                    description: 'Video hakkında kısa bir açıklama veya tanıtım yazısı buraya gelecek.',
+                    buttonText: 'Videoyu İzle'
+                }
+            };
+
+        case 'image-grid':
+            return {
+                id,
+                type: 'image-grid',
+                order,
+                data: {
+                    columns: 2,
+                    aspectRatio: '3/4',
+                    images: [
+                        { id: 'g1', url: 'https://placehold.co/600x800?text=G%C3%B6rsel+1', alt: '' },
+                        { id: 'g2', url: 'https://placehold.co/600x800?text=G%C3%B6rsel+2', alt: '' }
+                    ]
+                }
             };
 
         default:

@@ -1,5 +1,9 @@
+"use client";
+
 import { TextBlock } from "@/types/page-builder";
 import { InlineText } from "../InlineText";
+import { RichText } from "../RichText";
+
 
 interface TextBlockComponentProps {
     block: TextBlock;
@@ -31,7 +35,7 @@ export function TextBlockComponent({ block, isEditing = false, onUpdate }: TextB
     return (
 
         <section className="w-full bg-slate-50 dark:bg-slate-900">
-            <div className="container mx-auto px-4 pt-2 pb-2 md:pt-4 md:pb-4">
+            <div className="container mx-auto px-4 pt-1 pb-2 md:pt-2 md:pb-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="relative bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-700 overflow-hidden">
                         <div className="relative z-10 px-6 py-8 md:px-12 md:py-14">
@@ -39,18 +43,18 @@ export function TextBlockComponent({ block, isEditing = false, onUpdate }: TextB
                             {(title || isEditing) && (
                                 <div className="mb-6">
                                     {isEditing ? (
-                                        <InlineText
+                                        <RichText
                                             value={title || ""}
                                             placeholder="Blok Başlığı (İsteğe bağlı)"
                                             onSave={handleSaveTitle}
-                                            tagName="h3"
-                                            className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white mb-2"
+                                            className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white mb-6"
                                         />
                                     ) : (
                                         title && (
-                                            <h3 className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white mb-4">
-                                                {title}
-                                            </h3>
+                                            <div
+                                                className="text-2xl md:text-3xl font-bold text-[#1a1b1f] dark:text-white mb-6"
+                                                dangerouslySetInnerHTML={{ __html: title }}
+                                            />
                                         )
                                     )}
                                 </div>
@@ -58,28 +62,27 @@ export function TextBlockComponent({ block, isEditing = false, onUpdate }: TextB
 
                             {isEditing ? (
                                 <div
-                                    className={`prose prose-lg prose-slate dark:prose-invert max-w-none ${isPlaceholder ? 'opacity-50' : ''}`}
-                                    onClick={() => {
-                                        // If it's placeholder, clear it immediately so user can type
+                                    className={`text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed ${isPlaceholder ? 'opacity-50' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         if (isPlaceholder && onUpdate) {
                                             onUpdate({ ...block.data, content: '' });
                                         }
                                     }}
                                 >
-                                    <InlineText
+                                    <RichText
                                         value={content || PLACEHOLDER}
                                         onSave={handleSaveContent}
-                                        tagName="div"
-                                        className="min-h-[1.5em] outline-none"
-                                        multiline={true}
+                                        placeholder="Buraya metin giriniz..."
                                     />
                                 </div>
                             ) : (
                                 <div
-                                    className="prose prose-lg prose-slate dark:prose-invert max-w-none"
+                                    className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-none"
                                     dangerouslySetInnerHTML={{ __html: content || '' }}
                                 />
                             )}
+
                         </div>
                     </div>
                 </div>

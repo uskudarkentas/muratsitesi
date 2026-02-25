@@ -147,7 +147,7 @@ export default function ContactPage() {
                             {/* --- ROW 2 --- */}
 
                             {/* Contact Responsible (Left - 1 Col) */}
-                            <div className="lg:col-span-1 bg-primary text-white rounded-[2rem] p-8 shadow-xl shadow-primary/20 h-auto lg:h-full flex flex-col relative group hover:shadow-primary/30 transition-all duration-300">
+                            <div className="lg:col-span-1 bg-primary text-white rounded-[2rem] p-8 shadow-xl shadow-primary/20 h-auto lg:h-full flex flex-col relative group hover:shadow-primary/30 transition-all duration-300 overflow-hidden">
                                 {/* Abstract Background Pattern */}
                                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/15 transition-colors duration-500"></div>
                                 <div className="absolute bottom-0 left-0 w-full h-2/3 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -165,10 +165,10 @@ export default function ContactPage() {
                                         Kentsel Dönüşüm Uzmanı
                                     </p>
 
-                                    <div className="mt-auto bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-default shadow-inner shadow-white/5">
-                                        <div className="text-white/70 text-[10px] font-bold uppercase tracking-widest mb-2">Doğrudan İletişim</div>
+                                    <div className="mt-auto bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-default shadow-inner shadow-white/5 relative z-20">
+                                        <div className="text-white/80 text-[10px] font-bold uppercase tracking-widest mb-2">Doğrudan İletişim</div>
                                         <div className="flex flex-col gap-1">
-                                            <a href="tel:4440875" className="text-3xl font-bold tracking-tight hover:text-white transition-colors">444 0 875</a>
+                                            <a href="tel:4440875" className="text-3xl font-bold tracking-tight text-white hover:text-white/90 transition-colors">444 0 875</a>
                                             <span className="text-white/80 font-medium flex items-center gap-2 text-sm bg-white/10 w-fit px-2 py-0.5 rounded">
                                                 Dahili: <span className="font-bold text-white">3018</span>
                                             </span>

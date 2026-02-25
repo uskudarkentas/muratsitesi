@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db as prisma } from "@/core/database/client";
 import { StageStatus } from "@prisma/client";
+import { recordProjectUpdate } from "@/lib/actions/project-updates";
 
 
 // ============================================
@@ -115,6 +116,14 @@ export async function createStage(data: {
             });
         }
 
+        // Record activity
+        await recordProjectUpdate({
+            title: "Yeni Aşama Eklendi",
+            description: `'${data.title}' aşaması proje sürecine eklendi.`,
+            type: "EKLENDI",
+            category: "PROJE"
+        });
+
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath("/admin/timeline");
@@ -214,11 +223,28 @@ export async function updateStage(
                     data
                 });
             }
+
+            // Record activity if status changed to COMPLETED
+            const stage = await prisma.stage.findUnique({ where: { id }, select: { title: true } });
+            await recordProjectUpdate({
+                title: "Aşama Tamamlandı",
+                description: `'${stage?.title || 'Bilinmeyen'}' aşaması başarıyla tamamlandı.`,
+                type: "TAMAMLANDI",
+                category: "PROJE"
+            });
         } else {
             // Normal individual update
             await prisma.stage.update({
                 where: { id },
                 data,
+            });
+
+            const stage = await prisma.stage.findUnique({ where: { id }, select: { title: true } });
+            await recordProjectUpdate({
+                title: "Aşama Güncellendi",
+                description: `'${stage?.title || 'Bilinmeyen'}' aşaması detayları güncellendi.`,
+                type: "GUNCELLENDI",
+                category: "PROJE"
             });
         }
 
@@ -308,6 +334,14 @@ export async function createEvent(data: {
 
         revalidatePath("/");
         revalidatePath("/admin");
+
+        // Record activity
+        await recordProjectUpdate({
+            title: "Yeni Toplantı Eklendi",
+            description: `'${data.title}' toplantısı takvime eklendi.`,
+            type: "YAYINLANDI",
+            category: "TOPLANTI"
+        });
 
         return { success: true, event };
     } catch (error) {
@@ -429,6 +463,25 @@ export async function createPost(data: {
         revalidatePath("/");
         revalidatePath("/admin");
         revalidatePath(`/asamalar/${post.stageId}`);
+
+        // Record activity
+        const typeLabels: Record<string, string> = {
+            'ANNOUNCEMENT': 'Duyuru',
+            'MEETING': 'Toplantı',
+            'SURVEY': 'Anket'
+        };
+        const categoryLabels: Record<string, string> = {
+            'ANNOUNCEMENT': 'DUYURU',
+            'MEETING': 'TOPLANTI',
+            'SURVEY': 'ANKET'
+        };
+
+        await recordProjectUpdate({
+            title: `Yeni ${typeLabels[data.type || 'ANNOUNCEMENT']} Yayında`,
+            description: `'${data.title}' başlıklı ${typeLabels[data.type || 'ANNOUNCEMENT'].toLowerCase()} yayınlandı.`,
+            type: "YAYINLANDI",
+            category: categoryLabels[data.type || 'ANNOUNCEMENT']
+        });
 
         return { success: true, post };
     } catch (error) {

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { pageBuilderService } from "@/features/page-builder/services/pageBuilderService";
+import { recordProjectUpdate } from "@/lib/actions/project-updates";
+import { db } from "@/lib/db";
 
 /**
  * Server Actions for Page Builder
@@ -42,6 +44,23 @@ export async function savePageContent(slug: string, blocks: any[]) {
 
         revalidatePath(`/asamalar/${slug}`);
         revalidatePath("/admin/page-builder");
+
+        // Record activity
+        let pageTitle = slug;
+        // Try to find a meaningful title
+        if (slug === 'home') pageTitle = 'Ana Sayfa';
+        else if (slug === 'contact') pageTitle = 'İletişim';
+        else {
+            const stage = await db.stage.findUnique({ where: { slug }, select: { title: true } });
+            if (stage) pageTitle = stage.title;
+        }
+
+        await recordProjectUpdate({
+            title: "Sayfa Tasarımı Güncellendi",
+            description: `'${pageTitle}' sayfası içeriği ve tasarımı güncellendi.`,
+            type: "GUNCELLENDI",
+            category: "TASARIM"
+        });
 
         return {
             success: true,

@@ -22,41 +22,43 @@ async function main() {
     await prisma.post.deleteMany();
     await prisma.stage.deleteMany();
     await prisma.user.deleteMany(); // Clear users too
+    try {
+        // @ts-ignore
+        await prisma.projectUpdate.deleteMany();
+    } catch (e) {
+        console.log("ProjectUpdate table might not exist yet, skipping delete.");
+    }
 
     console.log('🧹 Cleaned up existing data.');
 
-    // 2. Create Users (20 Dummy Residents)
+    // 2. Create Users (1240 Residents)
     const firstNames = ["Ahmet", "Mehmet", "Ayşe", "Fatma", "Mustafa", "Zeynep", "Ali", "Elif", "Murat", "Hülya", "Can", "Selin", "Burak", "Ceren", "Emre", "Gamze", "Kaan", "Deniz", "Oğuz", "Sibel"];
     const lastNames = ["Yılmaz", "Demir", "Çelik", "Kaya", "Şahin", "Öztürk", "Aydın", "Özdemir", "Arslan", "Doğan", "Kılıç", "Aslan", "Çetin", "Kara", "Koç", "Kurt", "Özkan", "Şimşek", "Polat", "Öz"];
 
     const users = [];
-    for (let i = 0; i < 20; i++) {
+    const targetUserCount = 1240;
+
+    console.log(`Creating ${targetUserCount} users...`);
+    const userBatchSize = 100; // Create in batches to avoid huge memory usage if needed, but 1240 is small enough for loop
+
+    for (let i = 0; i < targetUserCount; i++) {
         const firstName = random(firstNames);
         const lastName = random(lastNames);
         const user = await prisma.user.create({
             data: {
-                email: `user${i}@example.com`,
-                passwordHash: "dummyhash", // Not used for analytics, just placeholder
+                email: `user${i + 1}@example.com`,
+                passwordHash: "dummyhash",
                 fullName: `${firstName} ${lastName}`,
                 role: "RESIDENT",
-                apartmentInfo: `${Math.floor(i / 4) + 1}. Blok Daire ${i % 4 + 1}`, // A Blok Daire 1...
+                apartmentInfo: `${Math.floor(i / 40) + 1}. Blok Daire ${i % 40 + 1}`,
+                createdAt: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)) // Random created in last 30 days
             }
         });
         users.push(user);
     }
-    console.log('👥 Created 20 dummy users.');
+    console.log(`👥 Created ${users.length} dummy users.`);
 
     // 3. Create Stages (3 COMPLETED, 1 ACTIVE, Rest LOCKED)
-    const stagesData = [
-        { title: "Başvuru", slug: "basvuru", status: "COMPLETED", sequenceOrder: 1.0, iconKey: "folder_open" },
-        { title: "Ön Teklif", slug: "on-teklif", status: "COMPLETED", sequenceOrder: 2.0, iconKey: "upload_file" },
-        { title: "Kesin Teklif", slug: "kesin-teklif", status: "COMPLETED", sequenceOrder: 3.0, iconKey: "check_box" },
-        { title: "Uzlaşma Görüşmeleri", slug: "uzlasma-gorusmeleri", status: "ACTIVE", sequenceOrder: 4.0, iconKey: "groups" }, // Changed to ACTIVE as per request "Riskli Yapı İlanı" was mentioned as active but let's stick to sequence. Wait, user said "Riskli Yapı İlanı" is active. Let's find it.
-        // User said: "Ensure 3 Stages are 'COMPLETED', 1 is 'ACTIVE' (e.g., "Riskli Yapı İlanı")..."
-        // Let's adjust statuses explicitly.
-    ];
-
-    // Full list definition with explicit statuses based on request
     const allStages = [
         { title: "Başvuru", slug: "basvuru", status: "COMPLETED", seq: 1.0, iconKey: "folder_open" },
         { title: "Ön Teklif", slug: "on-teklif", status: "COMPLETED", seq: 2.0, iconKey: "upload_file" },
@@ -64,7 +66,7 @@ async function main() {
         { title: "Uzlaşma Görüşmeleri", slug: "uzlasma-gorusmeleri", status: "LOCKED", seq: 4.0, iconKey: "groups" },
         { title: "Temsili Sözleşme", slug: "temsili-sozlesme", status: "LOCKED", seq: 5.0, iconKey: "star" },
         { title: "Karot Alımı", slug: "karot-alimi", status: "LOCKED", seq: 6.0, iconKey: "science" },
-        { title: "Riskli Yapı İlanı", slug: "riskli-yapi-ilani", status: "ACTIVE", seq: 7.0, iconKey: "apartment" }, // Requested Active
+        { title: "Riskli Yapı İlanı", slug: "riskli-yapi-ilani", status: "ACTIVE", seq: 7.0, iconKey: "apartment" },
         { title: "Sözleşme", slug: "sozlesme", status: "LOCKED", seq: 8.0, iconKey: "signature" },
         { title: "Tahliye Süreci", slug: "tahliye-sureci", status: "LOCKED", seq: 9.0, iconKey: "moving" },
         { title: "Ruhsat Alımı", slug: "ruhsat-alimi", status: "LOCKED", seq: 10.0, iconKey: "article" },
@@ -73,14 +75,6 @@ async function main() {
     ];
 
     for (const s of allStages) {
-        // Adjust for "3 Completed": The first 3 are marked COMPLETED above.
-        // Adjust for "1 Active": Riskli Yapı İlanı is marked ACTIVE.
-        // Others LOCKED.
-        // Re-verify logic:
-        // If I make Riskli Yapı Active (7.0), usually previous ones should be completed.
-        // But user specifically said "Ensure 3 Stages are 'COMPLETED', 1 is 'ACTIVE'".
-        // This implies a gap or strict user overriding. I will follow user request exactly.
-
         await prisma.stage.create({
             data: {
                 title: s.title,
@@ -100,7 +94,6 @@ async function main() {
     if (!activeStage) throw new Error("Active stage not found");
 
     // 4. Create Posts
-    // 4a. Active Survey (Expires in 5 days)
     const survey = await prisma.post.create({
         data: {
             stageId: activeStage.id,
@@ -109,24 +102,22 @@ async function main() {
             content: JSON.stringify({ blocks: [{ type: "paragraph", data: { text: "Binalarımızın dış cephesi için renk tercihinizi belirtiniz." } }] }),
             isPublished: true,
             publishedAt: new Date(),
-            expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) // +5 days
+            expiresAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
         }
     });
 
-    // 4b. Past Meeting (Date passed)
     await prisma.post.create({
         data: {
-            stageId: activeStage.id, // Or maybe a previous stage? Let's put in active for visibility
+            stageId: activeStage.id,
             type: "MEETING",
             title: "Bilgilendirme Toplantısı (Geçmiş)",
             content: JSON.stringify({ blocks: [{ type: "paragraph", data: { text: "Geçmiş bilgilendirme toplantısı detayları." } }] }),
             isPublished: true,
-            publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-            eventDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+            publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+            eventDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
         }
     });
 
-    // 4c. Upcoming Meeting (Future)
     await prisma.post.create({
         data: {
             stageId: activeStage.id,
@@ -135,89 +126,213 @@ async function main() {
             content: JSON.stringify({ blocks: [{ type: "paragraph", data: { text: "Önümüzdeki genel kurul toplantısı." } }] }),
             isPublished: true,
             publishedAt: new Date(),
-            eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // In 7 days
+            eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         }
     });
     console.log('✅ Posts created.');
 
-    // 5. Generate Analytics Logs (~200 logs, wavy pattern, 30 days)
+    // 5. Generate Analytics Logs
     console.log('Generating analytics logs...');
-
-    // Distribution weights
-    // VIEW: 60%, CLICK: 30%, ACTION: 10%
-    const types = [
-        ...Array(60).fill('VIEW'),
-        ...Array(30).fill('CLICK'),
-        ...Array(10).fill('ACTION')
-    ];
-
     const logsData = [];
     const today = new Date();
 
+    // 5a. Generic Traffic (Page Views, etc.)
     for (let day = 0; day < 30; day++) {
-        // day 0 = 29 days ago, day 29 = today
         const date = new Date(today);
         date.setDate(date.getDate() - (29 - day));
 
-        // Logs for this day: Base 5 + Amplitude 5 (0-10) -> range 5-15 logs/day?
-        // User wants ~200 total logs. 200 / 30 = ~6.6 logs/day.
-        // Let's use Base 3, Amplitude 4 -> 3 + [-4..4] -> wait, min 0.
-        // Log count = 3 + 4 * sin(...) -> range 0 to 7? 7*30 = 210. Perfect.
-
-        let count = Math.max(0, Math.floor(4 + 4 * Math.sin((day / 5) * Math.PI))); // Period ~10 days
-
-        // Add random jitter
-        count += Math.floor(Math.random() * 3);
+        // Random daily traffic
+        let count = Math.floor(Math.random() * 20) + 5;
 
         for (let i = 0; i < count; i++) {
             const user = random(users);
-            const type = random(types);
-
-            // Infer action string from type
-            let actionName = "";
-            let targetId = null;
-
-            if (type === 'VIEW') {
-                actionName = "PAGE_VIEW";
-                targetId = "home";
-            } else if (type === 'CLICK') {
-                actionName = random(["OPEN_ACCORDION", "EXPAND_DETAILS", "CLICK_POST"]);
-                targetId = "details";
-            } else {
-                actionName = random(["VOTE_SURVEY_1", "JOIN_MEETING", "DOWNLOAD_PDF"]);
-                targetId = survey.id;
-            }
-
-            // Distribute timestamps within the day
             const logTime = new Date(date);
-            logTime.setHours(9 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60)); // 09:00 - 21:00
+            logTime.setHours(9 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60));
 
             logsData.push({
                 userId: user.id,
-                action: actionName,
-                actionType: type,
-                targetId: targetId,
-                ipAddress: `192.168.1.${Math.floor(Math.random() * 255)}`,
+                action: "PAGE_VIEW",
+                actionType: "VIEW",
+                targetId: "home",
+                ipAddress: "192.168.1.1",
+                device: random(['MOBILE', 'DESKTOP', 'TABLET']),
                 timestamp: logTime
             });
         }
     }
 
-    // Bulk insert (using individual create usually better for validity but createMany is faster if supported by SQLite/Prisma version for this model)
-    // SQLite supports createMany in newer Prisma versions.
-    // If createMany fails, we fall back to loop.
-    try {
-        await prisma.analyticsLog.createMany({
-            data: logsData
+    // 5b. Specific KPI Logs (ANKET_VOTE & SOCIAL_SHARE)
+    // KPI 1: 850 Survey Votes (ANKET_VOTE) in last 14 days
+    console.log("Generating 850 ANKET_VOTE logs...");
+    for (let i = 0; i < 850; i++) {
+        const user = users[i % users.length]; // Cycle through users
+        const daysAgo = Math.floor(Math.random() * 14); // Last 14 days
+        const logTime = new Date(today);
+        logTime.setDate(logTime.getDate() - daysAgo);
+        logTime.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
+
+        logsData.push({
+            userId: user.id,
+            action: "ANKET_VOTE",
+            actionType: "ACTION",
+            targetId: survey.id,
+            ipAddress: "192.168.1.1",
+            device: random(['MOBILE', 'DESKTOP', 'TABLET']),
+            timestamp: logTime
         });
-    } catch (e) {
-        // Fallback for older prisma/sqlite combos if needed
-        for (const log of logsData) {
-            await prisma.analyticsLog.create({ data: log });
-        }
     }
 
-    console.log(`✅ Generated ${logsData.length} analytics logs.`);
+    // KPI 2: 320 Social Shares (SOCIAL_SHARE) in last 14 days
+    console.log("Generating 320 SOCIAL_SHARE logs...");
+    for (let i = 0; i < 320; i++) {
+        const user = users[i % users.length];
+        const daysAgo = Math.floor(Math.random() * 14);
+        const logTime = new Date(today);
+        logTime.setDate(logTime.getDate() - daysAgo);
+        logTime.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
+
+        logsData.push({
+            userId: user.id,
+            action: "SOCIAL_SHARE",
+            actionType: "ACTION",
+            targetId: survey.id,
+            ipAddress: "192.168.1.1",
+            device: random(['MOBILE', 'DESKTOP', 'TABLET']),
+            timestamp: logTime
+        });
+    }
+
+    // KPI 3: Announcement Views (DUYURU)
+    console.log("Generating 400 DUYURU_VIEW logs...");
+    for (let i = 0; i < 400; i++) {
+        const user = users[i % users.length];
+        const daysAgo = Math.floor(Math.random() * 14);
+        const logTime = new Date(today);
+        logTime.setDate(logTime.getDate() - daysAgo);
+        logTime.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
+
+        logsData.push({
+            userId: user.id,
+            action: "DUYURU_VIEW",
+            actionType: "VIEW",
+            targetId: "announcement-1",
+            ipAddress: "192.168.1.1",
+            device: random(['MOBILE', 'DESKTOP', 'TABLET']),
+            timestamp: logTime
+        });
+    }
+
+    // KPI 4: Meeting Views (TOPLANTI)
+    console.log("Generating 300 TOPLANTI_VIEW logs...");
+    for (let i = 0; i < 300; i++) {
+        const user = users[i % users.length];
+        const daysAgo = Math.floor(Math.random() * 14);
+        const logTime = new Date(today);
+        logTime.setDate(logTime.getDate() - daysAgo);
+        logTime.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
+
+        logsData.push({
+            userId: user.id,
+            action: "TOPLANTI_VIEW",
+            actionType: "VIEW",
+            targetId: "meeting-1",
+            ipAddress: "192.168.1.1",
+            device: random(['MOBILE', 'DESKTOP', 'TABLET']),
+            timestamp: logTime
+        });
+    }
+
+    // Batch insert logs
+    console.log(`Inserting ${logsData.length} logs...`);
+    // Split into chunks of 500 to be safe
+    const chunkSize = 500;
+    for (let i = 0; i < logsData.length; i += chunkSize) {
+        const chunk = logsData.slice(i, i + chunkSize);
+        await prisma.analyticsLog.createMany({
+            data: chunk
+        });
+    }
+
+    // 6. Create Admin User & System Logs
+    console.log("Creating Admin user and system logs...");
+
+    // Check if admin exists or create one
+    const adminUser = await prisma.user.create({
+        data: {
+            email: "admin@muratsitesi.com",
+            passwordHash: "admin123",
+            fullName: "Murat Yönetim",
+            role: "ADMIN",
+            createdAt: new Date()
+        }
+    });
+
+    const systemActions = ['CREATE_POST', 'UPDATE_STAGE', 'UPDATE_PAGE', 'PUBLISH_SURVEY', 'ADD_BLOCK'];
+    const systemLogs = [];
+
+    for (let i = 0; i < 15; i++) {
+        const action = random(systemActions);
+        const logTime = new Date(today);
+        logTime.setDate(logTime.getDate() - Math.floor(Math.random() * 30));
+        logTime.setHours(9 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60));
+
+        systemLogs.push({
+            userId: adminUser.id,
+            action: action,
+            actionType: "SYSTEM",
+            targetId: "system",
+            ipAddress: "192.168.1.100",
+            timestamp: logTime
+        });
+    }
+
+    await prisma.analyticsLog.createMany({
+        data: systemLogs
+    });
+
+    // 7. Create Urban Transformation Project Updates (Specific Request)
+    console.log("Creating specific Urban Transformation project updates...");
+
+    // Scenarios provided by user
+    const urbanScenarios = [
+        { title: "Bilgilendirme Toplantısı Eklendi", description: "C Blok sakinleri için haftalık ilerleme toplantısı takvime eklendi.", type: "EKLENDI", category: "TOPLANTI" },
+        { title: "Yeni Aşama Yayında", description: "Proje süreci 'Riskli Yapı İlanı' aşamasına başarıyla geçirildi.", type: "YAYINLANDI", category: "AŞAMA" },
+        { title: "Anayapı Sayfası Tasarlandı", description: "Page Builder üzerinden anasayfa görsel ve metinleri güncellendi.", type: "GUNCELLENDI", category: "TASARIM" },
+        { title: "Yeni Anket Başlatıldı", description: "Sosyal tesis kullanım tercihleri için oylama süreci başladı.", type: "EKLENDI", category: "ANKET" },
+        { title: "Duyuru Paylaşıldı", description: "Otopark girişlerindeki düzenleme hakkında genel duyuru yayınlandı.", type: "YAYINLANDI", category: "DUYURU" },
+        { title: "Aşama Detayları Güncellendi", description: "Uzlaşma görüşmeleri takvimi ve gerekli belgeler listesi güncellendi.", type: "GUNCELLENDI", category: "AŞAMA" },
+        { title: "Render Görüntüleri Eklendi", description: "Yeni blok tasarımlarına ait 3D yüksek çözünürlüklü görseller yüklendi.", type: "EKLENDI", category: "TASARIM" },
+        { title: "Toplantı Notları Paylaşıldı", description: "Dünkü yönetim kurulu toplantısının özet kararları paylaşıldı.", type: "YAYINLANDI", category: "TOPLANTI" },
+        { title: "Anket Tamamlandı", description: "Dış cephe renk seçimi anketi sonuçları sisteme kaydedildi.", type: "TAMAMLANDI", category: "ANKET" }
+    ];
+
+    const urbanLogs = urbanScenarios.map(scenario => {
+        // Distribute strictly over last 7 days for realistic "X days ago" labels
+        const logTime = new Date(today);
+        const daysAgo = Math.floor(Math.random() * 7);
+        const hoursAgo = Math.floor(Math.random() * 24);
+
+        logTime.setDate(logTime.getDate() - daysAgo);
+        logTime.setHours(logTime.getHours() - hoursAgo);
+
+        return {
+            title: scenario.title,
+            description: scenario.description,
+            type: scenario.type,
+            category: scenario.category,
+            createdAt: logTime
+        };
+    });
+
+    try {
+        // @ts-ignore
+        await prisma.projectUpdate.createMany({
+            data: urbanLogs
+        });
+        console.log(`✅ Generated ${urbanLogs.length} urban transformation project updates.`);
+    } catch (e) {
+        console.error("❌ Failed to create ProjectUpdate entries:", e);
+    }
     console.log('🎉 Seeding finished.');
 }
 

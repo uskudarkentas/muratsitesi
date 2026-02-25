@@ -21,6 +21,8 @@ model User {
   apartmentInfo String?   @map("apartment_info") // Blok/Daire No
   lastLogin     DateTime? @map("last_login")
   
+  createdAt     DateTime  @default(now()) @map("created_at")
+
   votes         SurveyVote[]
   analytics     AnalyticsLog[]
 
@@ -63,6 +65,7 @@ model Post {
 
   stage       Stage    @relation(fields: [stageId], references: [id])
   votes       SurveyVote[]
+  shares      Share[]
 
   @@map("posts")
 }
@@ -86,6 +89,7 @@ model AnalyticsLog {
   action    String
   actionType String?   @map("action_type") // VIEW, CLICK, ACTION
   targetId  String?    @map("target_id") // Post ID or Stage ID
+  device    String?    @map("device") // MOBILE, DESKTOP, TABLET
   ipAddress String?    @map("ip_address")
   timestamp DateTime   @default(now())
 
@@ -104,3 +108,27 @@ model PageContent {
 
   @@map("page_contents")
 }
+
+model Share {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  platform  String?  // whatsapp, twitter, facebook, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post      Post     @relation(fields: [postId], references: [id])
+
+  @@map("shares")
+}
+
+model ProjectUpdate {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  type        String   // EKLENDI, GUNCELLENDI, YAYINLANDI, TAMAMLANDI
+  category    String   // MIMARI, HUKUKI, GENEL, etc.
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("project_updates")
+}
+
+

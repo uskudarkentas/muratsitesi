@@ -5,6 +5,7 @@ import { ActivityItem } from "./activity/ActivityItem";
 import { MOCK_ACTIVITIES } from "./activity/data";
 import { useEffect, useState } from "react";
 import { getRecentSystemActivities } from "@/actions/analytics";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface RecentActivityListProps {
     activities?: Activity[];
@@ -37,14 +38,25 @@ export function RecentActivityList({ activities: initialActivities }: RecentActi
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto relative no-scrollbar">
+            <div className="flex-1 relative">
                 {/* Vertical Timeline Line */}
                 <div className="absolute left-[39px] top-0 bottom-0 w-[1px] bg-gray-100/80 z-0" />
 
                 <div className="relative z-10 py-2">
-                    {activities.map((activity) => (
-                        <ActivityItem key={activity.id} activity={activity} />
-                    ))}
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        {activities.map((activity) => (
+                            <motion.div
+                                key={activity.id}
+                                layout
+                                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                                transition={{ duration: 0.3, type: "spring", stiffness: 200, damping: 20 }}
+                            >
+                                <ActivityItem activity={activity} />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

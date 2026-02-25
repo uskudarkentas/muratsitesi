@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { InlineText } from "../InlineText";
 import { IconPicker } from "../IconPicker";
+import { RichText } from "../RichText";
 
 interface InfoCardGridProps {
     block: InfoCardGridBlock;
@@ -106,31 +107,32 @@ export function InfoCardGrid({ block, isEditing = false, onUpdate }: InfoCardGri
                                     <div className="flex items-start gap-3 mb-4">
                                         <span className="w-1 h-6 bg-[#ed2630] rounded-full flex-shrink-0 mt-1"></span>
                                         {isEditing ? (
-                                            <InlineText
+                                            <RichText
                                                 value={card.title}
                                                 onSave={(val) => handleCardUpdate(index, 'title', val)}
-                                                tagName="h3"
-                                                className="text-xl font-bold text-[#1a1b1f] dark:text-white leading-tight"
+                                                className="text-xl font-semibold text-[#1a1b1f] dark:text-white leading-tight flex-1"
+                                                placeholder="Başlık"
                                             />
                                         ) : (
-                                            <h3 className="text-xl font-bold text-[#1a1b1f] dark:text-white leading-tight">
-                                                {card.title}
-                                            </h3>
+                                            <h3
+                                                className="text-xl font-semibold text-[#1a1b1f] dark:text-white leading-tight flex-1"
+                                                dangerouslySetInnerHTML={{ __html: card.title }}
+                                            />
                                         )}
                                     </div>
 
                                     {/* Description */}
                                     {isEditing ? (
-                                        <InlineText
+                                        <RichText
                                             value={card.description}
                                             onSave={(val) => handleCardUpdate(index, 'description', val)}
-                                            tagName="p"
                                             className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base"
                                         />
                                     ) : (
-                                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
-                                            {card.description}
-                                        </p>
+                                        <div
+                                            className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base prose prose-sm max-w-none"
+                                            dangerouslySetInnerHTML={{ __html: card.description }}
+                                        />
                                     )}
                                 </div>
                             );

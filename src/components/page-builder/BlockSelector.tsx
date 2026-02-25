@@ -54,10 +54,34 @@ const blockTemplates: BlockTemplate[] = [
         description: 'Tek görsel bloğu',
     },
     {
+        type: 'document-preview',
+        icon: 'description',
+        label: 'Doküman Önizleme Kartı',
+        description: 'Yatay döküman/infografik kartı',
+    },
+    {
+        type: 'slider',
+        icon: 'view_carousel',
+        label: 'Görsel Slider',
+        description: 'Kaydırılabilir görsel galerisi',
+    },
+    {
         type: 'divider',
         icon: 'horizontal_rule',
         label: 'Ayırıcı',
         description: 'Yatay çizgi',
+    },
+    {
+        type: 'video',
+        icon: 'video_camera_back',
+        label: 'Video Kartı',
+        description: 'Dikey video ve açıklamalı kart',
+    },
+    {
+        type: 'image-grid',
+        icon: 'grid_on',
+        label: 'Görsel Izgara',
+        description: 'Çoklu görsel dizisi (Grid)',
     },
 ];
 

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PageBuilderLayout } from "@/components/page-builder/PageBuilderLayout";
+console.log("PageBuilderPage Loaded - Ver: 2");
+
 import { PageSelector } from "@/components/page-builder/PageSelector";
 import { getPageContent, savePageContent } from "@/server/actions/pageBuilderActions";
 import { ContentBlock } from "@/types/page-builder";

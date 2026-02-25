@@ -196,6 +196,25 @@ export function BlockEditModal({ isOpen, onClose, onSave, block }: BlockEditModa
                     </div>
                 );
 
+            case 'document-preview':
+                return (
+                    <div className="space-y-4">
+                        <InputField label="Doküman Başlığı" value={formData.title} onChange={(v) => handleChange('title', v)} />
+                        <TextAreaField label="Açıklama (Opsiyonel)" value={formData.description} onChange={(v) => handleChange('description', v)} />
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Doküman Görseli (Dikey)</label>
+                            <FileUploadField
+                                value={formData.url}
+                                onChange={(url) => handleChange('url', url)}
+                                accept="image/*"
+                                label="Görsel Yükle"
+                            />
+                        </div>
+                        <InputField label="Buton Metni" value={formData.buttonText} onChange={(v) => handleChange('buttonText', v)} />
+                    </div>
+                );
+
+
             default:
                 return <p className="text-gray-500">Bu blok tipi için düzenleme alanı bulunamadı.</p>;
         }
@@ -277,6 +296,7 @@ function FileUploadField({ value, onChange, accept, label }: { value: string, on
         const file = e.target.files?.[0];
         if (!file) return;
 
+        console.log("DEBUG: File upload initiated:", file.name, file.type);
         setIsUploading(true);
 
         try {
@@ -284,15 +304,17 @@ function FileUploadField({ value, onChange, accept, label }: { value: string, on
             formData.append("file", file);
 
             const result = await uploadFile(formData);
+            console.log("DEBUG: File upload result:", result);
 
             if (result.success && result.url) {
                 onChange(result.url); // Set the URL back to parent
             } else {
                 alert("Dosya yüklenemedi: " + result.error);
             }
-        } catch (error) {
-            console.error(error);
-            alert("Bir hata oluştu");
+        } catch (error: any) {
+            console.error("Upload client error:", error);
+            alert("Bir hata oluştu: " + (error?.message || "Bilinmeyen hata"));
+
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
@@ -321,7 +343,11 @@ function FileUploadField({ value, onChange, accept, label }: { value: string, on
 
             {/* Upload Button */}
             <button
-                onClick={() => fileInputRef.current?.click()}
+                type="button"
+                onClick={() => {
+                    console.log("DEBUG: Upload button clicked");
+                    fileInputRef.current?.click();
+                }}
                 disabled={isUploading}
                 className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg transition-colors font-medium text-sm"
             >

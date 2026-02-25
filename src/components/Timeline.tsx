@@ -37,7 +37,7 @@ export default function Timeline({ stages }: TimelineProps) {
     const STAGES = stages; // Map prop to local variable to minimize code changes
 
     // Find the stage marked as ACTIVE in the database
-    const dbActiveIndex = STAGES.findIndex(s => s.status === 'ACTIVE');
+    const dbActiveIndex = STAGES.findIndex(s => s.status?.toUpperCase() === 'ACTIVE');
     const activeStageIndex = dbActiveIndex !== -1 ? dbActiveIndex : 0;
     const currentActiveStage = STAGES[activeStageIndex] || STAGES[0];
 
@@ -105,8 +105,8 @@ export default function Timeline({ stages }: TimelineProps) {
                     {STAGES.map((stage, index) => {
                         const isFocused = focusedIndex === index;
                         const isCurrent = index === activeStageIndex;
-                        const isPast = stage.status === 'COMPLETED';
-                        const isFuture = stage.status === 'LOCKED';
+                        const isPast = index < activeStageIndex;
+                        const isFuture = index > activeStageIndex;
 
                         // 2-1-2 Window visibility calculation
                         const isVisible = index >= visibleStart && index <= visibleEnd;

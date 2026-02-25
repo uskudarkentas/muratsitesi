@@ -56,11 +56,14 @@ export async function getRecentSystemActivities(limit = 5) {
     try {
         const logs = await db.analyticsLog.findMany({
             where: {
-                NOT: {
-                    action: 'PAGE_VIEW'
+                user: {
+                    role: 'ADMIN'
+                },
+                action: {
+                    in: ['CREATE_POST', 'UPDATE_STAGE', 'UPDATE_PAGE', 'PUBLISH_SURVEY', 'ADD_BLOCK']
                 }
             },
-            take: limit,
+            take: 5, // Strict limit
             orderBy: {
                 timestamp: 'desc'
             },
@@ -86,39 +89,36 @@ export async function getRecentSystemActivities(limit = 5) {
             let type: any = "system";
             let status: any = "Başarılı";
 
-            if (log.action.includes('CREATE_POST')) {
-                if (log.action.includes('MEETING')) {
-                    actionText = "Yeni toplantı planladı";
-                    type = "meeting";
-                } else if (log.action.includes('SURVEY')) {
-                    actionText = "Yeni anket oluşturdu";
-                    type = "survey";
-                } else {
-                    actionText = "Yeni duyuru yayınladı";
-                    type = "announcement";
-                }
+            // STRICT MAPPING Implementation (Refined)
+            if (log.action === 'CREATE_POST') {
+                actionText = "Yeni İçerik Eklendi";
+                type = "announcement";
                 status = "Yayınlandı";
-            } else if (log.action.includes('UPDATE_POST')) {
-                actionText = "İçeriği güncelledi";
-                type = "announcement";
-                status = "Güncellendi";
-            } else if (log.action.includes('DELETE_POST')) {
-                actionText = "İçeriği sildi";
-                type = "announcement";
-                status = "Tamamlandı";
-            } else if (log.action.includes('COMPLETE_STAGE')) {
-                actionText = "Aşama tamamlandı";
+            } else if (log.action === 'UPDATE_STAGE') {
+                actionText = "Süreç Güncellendi";
                 type = "system";
-                status = "İşlendi";
+                status = "Güncellendi";
+            } else if (log.action === 'ADD_BLOCK') {
+                actionText = "Sayfa Düzeni Değişti";
+                type = "page";
+                status = "Eklendi";
+            } else if (log.action === 'UPDATE_PAGE') {
+                actionText = "İçerik Sayfası Düzenlendi"; // Slight adjustment for grammar
+                type = "page";
+                status = "Düzenlendi";
+            } else if (log.action === 'PUBLISH_SURVEY') {
+                actionText = "Anket Başlatıldı";
+                type = "survey";
+                status = "Yayınlandı";
             }
 
             return {
                 id: log.id,
                 admin: {
                     name: log.user?.fullName || "Yönetici",
-                    role: log.user?.role === 'ADMIN' ? 'Yönetici' : 'Sistem',
-                    initials: log.user?.fullName ? log.user.fullName.split(' ').map(n => n[0]).join('') : "ÖA",
-                    color: log.user?.role === 'ADMIN' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
+                    role: 'Yönetici',
+                    initials: log.user?.fullName ? log.user.fullName.split(' ').map(n => n[0]).join('') : "YÖ",
+                    color: 'bg-blue-100 text-blue-700'
                 },
                 action: actionText,
                 target: log.targetId || "Sistem İşlemi",

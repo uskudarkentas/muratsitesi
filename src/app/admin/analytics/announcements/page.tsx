@@ -1,16 +1,18 @@
-"use client";
-
 import { StatsCards } from "@/components/admin/analytics/StatsCards";
 import { EngagementChart } from "@/components/admin/analytics/EngagementChart";
-import { DeviceDistributionChart } from "@/components/admin/analytics/DeviceDistributionChart";
 import { RecentPostsTable } from "@/components/admin/analytics/RecentPostsTable";
 import { AdminSidebar } from "@/components/admin/dashboard/AdminSidebar";
 import { PageViewTracker } from "@/components/PageViewTracker";
 import { MobileNavigation } from "@/components/admin/mobile/MobileNavigation";
+import { getDeviceStats } from "@/lib/actions/analytics";
+import DeviceDistributionCard from "@/components/DeviceDistributionCard";
+import { DownloadReportButton } from "@/components/admin/analytics/DownloadReportButton";
 
 import { downloadDashboardAsPDF } from "@/lib/reportUtils";
 
-export default function AnalyticsDashboardPage() {
+export default async function AnalyticsDashboardPage() {
+    const deviceStats = await getDeviceStats("DUYURU");
+
     return (
         <>
             <PageViewTracker />
@@ -32,13 +34,10 @@ export default function AnalyticsDashboardPage() {
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => downloadDashboardAsPDF('analytics-report-content', 'Duyuru_Analiz_Raporu')}
-                                    className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium shadow-sm hover:bg-gray-50 transition-colors"
-                                >
-                                    Raporu İndir
-                                </button>
-
+                                <DownloadReportButton
+                                    targetId="analytics-report-content"
+                                    fileName="Duyuru_Analiz_Raporu"
+                                />
                             </div>
                         </div>
 
@@ -56,7 +55,7 @@ export default function AnalyticsDashboardPage() {
 
                             {/* Side Chart - Takes 1 col */}
                             <div className="lg:col-span-1 h-[300px] lg:h-full">
-                                <DeviceDistributionChart color="#3b82f6" />
+                                <DeviceDistributionCard {...deviceStats} className="h-full" />
                             </div>
                         </section>
 
