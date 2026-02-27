@@ -7,18 +7,34 @@ import { SideDrawer } from "@/components/admin/mobile/SideDrawer";
 export function MobileNavigation() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth < 768);
+        setMounted(true);
+        const check = () => setIsMobile(window.innerWidth < 1024);
         check();
         window.addEventListener('resize', check);
-        return () => window.removeEventListener('resize', check);
+
+        // Fail-safe: Always remove scroll lock classes when navigating admin or mounting this
+        // This addresses issues where modals might have left the body locked
+        const unlock = () => {
+            document.body.classList.remove("antigravity-scroll-lock");
+            document.body.classList.remove("overflow-hidden");
+            document.body.style.overflow = "";
+        };
+
+        unlock();
+
+        return () => {
+            window.removeEventListener('resize', check);
+            unlock();
+        };
     }, []);
 
-    if (!isMobile) return null;
+    if (!mounted || !isMobile) return null;
 
     return (
-        <div className="md:hidden">
+        <div className="lg:hidden">
             {/* Mobile Bottom Navigation */}
             <BottomNav onMoreClick={() => setIsDrawerOpen(true)} />
 

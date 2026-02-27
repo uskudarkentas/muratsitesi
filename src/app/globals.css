@@ -166,6 +166,22 @@
     display: none !important;
   }
 
+  /* Scroll lock fail-safe: Ensure body is never locked if it doesn't have the specific class,
+     or provide a utility to forcefully unlock it. */
+  body.antigravity-scroll-lock {
+    overflow: hidden !important;
+  }
+
+  /* Reset overflow if no specific lock class is present */
+  body:not(.antigravity-scroll-lock) {
+    overflow: visible !important;
+  }
+
+  /* Admin specific override: Never lock scroll on admin layout unless a modal is explicitly open */
+  .admin-layout body {
+    overflow: auto !important;
+  }
+
   /* ── Tiptap / ProseMirror: inherit typography from parent ── */
   .ProseMirror {
     font-size: inherit;

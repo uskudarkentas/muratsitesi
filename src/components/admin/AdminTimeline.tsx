@@ -23,6 +23,9 @@ import { SimplifiedAnnouncementModal } from "@/components/admin/SimplifiedAnnoun
 import { StageManagerModal } from "@/components/admin/stage-manager/StageManagerModal";
 import { BuilderSidebar } from "@/components/admin/builder/BuilderSidebar";
 
+import { useAdminModals } from "@/hooks/useAdminModals";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+
 interface StageData {
     id: number;
     title: string;
@@ -51,117 +54,37 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
         hasSearchParams: !!searchParams
     });
 
-    const STAGES = stages; // Map prop to local variable
+    const STAGES = stages;
 
     // Find the stage marked as ACTIVE in the database
     const dbActiveIndex = STAGES.findIndex(s => s.status === 'ACTIVE');
-
-    // Use the ACTIVE status if found, otherwise fallback to first stage 
-    // (In production, the database should almost always have one active stage)
-    const activeStageIndex = dbActiveIndex !== -1
-        ? dbActiveIndex
-        : 0;
-
+    const activeStageIndex = dbActiveIndex !== -1 ? dbActiveIndex : 0;
     const currentActiveStage = STAGES[activeStageIndex] || STAGES[0];
 
     const containerRef = useRef<HTMLDivElement>(null);
     const { focusedIndex, handleScroll, scrollToIndex } =
         useTimelineScroll(containerRef, activeStageIndex, 64);
     const { handleShare } = useStageShare();
-    const [mobilePopupIndex, setMobilePopupIndex] = useState<number | null>(
-        null
-    );
-    const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
-    const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
+    const [mobilePopupIndex, setMobilePopupIndex] = useState<number | null>(null);
     const [selectedMeeting, setSelectedMeeting] = useState<any | null>(null);
-    const [stageToDelete, setStageToDelete] = useState<number | null>(null);
-    const [stageToComplete, setStageToComplete] = useState<number | null>(null);
 
-    const [initialContentType, setInitialContentType] = useState<'heading' | 'text' | 'image' | null>(null);
-    const [initialPostType, setInitialPostType] = useState<'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null>(null);
-
-
-    // Handle quick add button click for post types (ANNOUNCEMENT, MEETING, SURVEY)
-    const handleQuickAddPost = (stageId: number, postType: 'ANNOUNCEMENT' | 'MEETING' | 'SURVEY' | null = null) => {
-        setSelectedStageId(stageId);
-        setInitialPostType(postType);
-        setInitialContentType(null); // Ensure content type is reset
-        setShowAnnouncementModal(true);
-    };
-
-    // Handle delete button click
-    const handleDeleteClick = (stageId: number) => {
-        setStageToDelete(stageId);
-    };
-
-    // Handle delete confirmation
-    const handleDeleteConfirm = async () => {
-        if (stageToDelete === null) return;
-
-        // Prevent deletion of default stages (Server-side check should also exist, but this is immediate UI feedback)
-        if (stageToDelete <= 12) {
-            alert('Varsayılan aşamalar silinemez.');
-            setStageToDelete(null);
-            return;
-        }
-
-        try {
-            await deleteStage(stageToDelete);
-            setStageToDelete(null);
-            // Optionally refresh the page or update the stages list
-            window.location.reload();
-        } catch (error) {
-            console.error("Failed to delete stage:", error);
-            alert("Aşama silinirken bir hata oluştu.");
-        }
-    };
-
-    // Handle Stage Completion - Step 1: Trigger Modal
-    const handleComplete = (stageId: number) => {
-        setStageToComplete(stageId);
-    };
-
-    // Handle Stage Completion - Step 2: Confirmation
-    const handleCompleteConfirm = async () => {
-        if (stageToComplete === null) return;
-
-        try {
-            const result = await completeStage(stageToComplete);
-            setStageToComplete(null);
-            if (result.success) {
-                alert(result.message);
-                window.location.reload();
-            } else {
-                alert("Hata: " + result.message);
-            }
-        } catch (error) {
-            console.error("Failed to complete stage:", error);
-            alert("İşlem sırasında bir hata oluştu.");
-            setStageToComplete(null);
-        }
-    };
-
-    // Post/Meeting Management
-    const [postToEdit, setPostToEdit] = useState<any | null>(null);
-    const [postToDelete, setPostToDelete] = useState<string | null>(null);
-
-    const handleDeletePostConfirm = async () => {
-        if (!postToDelete) return;
-
-        try {
-            const result = await deletePost(postToDelete);
-            if (result.success) {
-                setPostToDelete(null);
-                window.location.reload();
-            } else {
-                alert("Hata: " + result.error);
-            }
-        } catch (error) {
-            console.error("Failed to delete post:", error);
-            alert("İşlem silinirken bir hata oluştu.");
-        }
-    };
-
+    // SOLID Refactor: Use custom hook for modal management
+    const {
+        stageToDelete, setStageToDelete,
+        stageToComplete, setStageToComplete,
+        postToDelete, setPostToDelete,
+        showAnnouncementModal,
+        selectedStageId,
+        postToEdit,
+        initialPostType,
+        initialContentType,
+        handleQuickAddPost,
+        handleEditPost,
+        handleDeleteStageConfirm,
+        handleCompleteStageConfirm,
+        handleDeletePostConfirm,
+        closeAnnouncementModal
+    } = useAdminModals();
 
     // Context for Sidebar/Content sync
     const { setFocusedStageId } = useTimelineContext();
@@ -181,15 +104,11 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
 
     // Navigation handlers
     const handleNext = () => {
-        if (focusedIndex < STAGES.length - 1) {
-            scrollToIndex(focusedIndex + 1);
-        }
+        if (focusedIndex < STAGES.length - 1) scrollToIndex(focusedIndex + 1);
     };
 
     const handlePrevious = () => {
-        if (focusedIndex > 0) {
-            scrollToIndex(focusedIndex - 1);
-        }
+        if (focusedIndex > 0) scrollToIndex(focusedIndex - 1);
     };
 
     const handleJumpTo = (index: number) => {
@@ -205,7 +124,7 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
     }>({ isOpen: false });
 
     // Handle Edit Stage
-    const handleEditStage = (stage: any) => {
+    const handleEditStageAction = (stage: any) => {
         setManagerModalProps({
             isOpen: true,
             editStage: stage
@@ -223,10 +142,8 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
 
     return (
         <>
-            {/* Header Controls - Mobile Only / Adapted for Desktop */}
+            {/* Header Controls */}
             <div className="fixed top-24 left-4 md:left-8 z-[40] flex flex-col gap-2 pointer-events-none lg:pointer-events-auto">
-
-                {/* Panel Back Button - Mobile Only */}
                 <div className="pointer-events-auto lg:hidden">
                     <Link href="/admin" className="flex items-center gap-2 text-gray-500 hover:text-[#ed2630] bg-white/90 p-2 rounded-lg shadow-sm backdrop-blur border border-gray-100 transition-colors w-fit">
                         <span className="material-symbols-outlined">arrow_back</span>
@@ -234,7 +151,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                     </Link>
                 </div>
 
-                {/* Mobile Toggle for Structure Mode */}
                 <div className="pointer-events-auto lg:hidden">
                     <button
                         onClick={() => setIsStructureMode(!isStructureMode)}
@@ -249,7 +165,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                 </div>
             </div>
 
-            {/* Desktop "Finish Editing" Button - Positioned on the right side */}
             {isStructureMode && (
                 <div className="fixed top-28 right-8 z-[40] hidden lg:block">
                     <button
@@ -262,7 +177,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                 </div>
             )}
 
-            {/* Builder Sidebar */}
             <BuilderSidebar
                 onAddStage={() => setIsStructureMode(true)}
                 onAddPost={(type) => {
@@ -270,14 +184,10 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                 }}
             />
 
-            {/* Main Content Layout */}
             <div className="relative w-full h-full min-h-[80vh] overflow-hidden">
-                {/* Timeline Container */}
                 <div className="relative w-full h-full flex justify-center items-start">
-                    {/* Central Line */}
                     <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px] bg-gray-200 dark:bg-gray-700 z-0"></div>
 
-                    {/* Scrollable Container */}
                     <div
                         ref={containerRef}
                         onScroll={handleScroll}
@@ -286,17 +196,8 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                             height: `${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH}dvh`,
                             paddingTop: `calc(${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH / 2}dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`,
                             paddingBottom: `calc(${TIMELINE_CONSTANTS.CONTAINER_HEIGHT_VH / 2}dvh - ${TIMELINE_CONSTANTS.ITEM_HEIGHT_VH / 2}dvh)`,
-                            scrollbarWidth: "none",
-                            msOverflowStyle: "none",
                         }}
                     >
-                        <style jsx>{`
-                            div::-webkit-scrollbar {
-                                display: none;
-                            }
-                        `}</style>
-
-                        {/* Insert First Button (Only in Structure Mode) */}
                         {isStructureMode && (
                             <div className="w-full h-[10dvh] flex items-center justify-center relative snap-center">
                                 <button
@@ -309,16 +210,10 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                             </div>
                         )}
 
-                        {/* Add trigger at the beginning - Disable in structure mode */}
                         {!isStructureMode && (
                             <AddContentTrigger
                                 position={0}
-                                onClick={() => {
-                                    if (STAGES[0]) {
-                                        // handleQuickAdd(STAGES[0].id); // Removed quick add, rely on sidebar
-                                        handleQuickAddPost(STAGES[0].id)
-                                    }
-                                }}
+                                onClick={() => STAGES[0] && handleQuickAddPost(STAGES[0].id)}
                             />
                         )}
 
@@ -327,22 +222,16 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                             const isCurrent = index === activeStageIndex;
                             const isPast = stage.status === 'COMPLETED';
                             const isFuture = stage.status === 'LOCKED';
-
-                            // 2-1-2 Window visibility calculation
-                            const isVisible =
-                                index >= visibleStart && index <= visibleEnd;
+                            const isVisible = index >= visibleStart && index <= visibleEnd;
                             const distanceFromActive = index - focusedIndex;
-
-                            // Check if stage is fixed (predefined)
                             const isFixed = PREDEFINED_STAGES.some(p => p.id === stage.id);
 
                             return (
                                 <div key={stage.id} className="relative">
-                                    {/* Edit Overlay in Structure Mode - Hidden for Fixed Stages */}
                                     {isStructureMode && isVisible && !isFixed && (
                                         <div className="absolute top-1/2 left-1/2 ml-16 -translate-y-1/2 z-50 flex flex-col gap-2">
                                             <button
-                                                onClick={() => handleEditStage(stage)}
+                                                onClick={() => handleEditStageAction(stage)}
                                                 className="bg-white text-slate-700 hover:text-[#ed2630] p-3 rounded-full shadow-lg border border-slate-200 transition-all hover:scale-110"
                                                 title="Düzenle"
                                             >
@@ -351,36 +240,27 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                                         </div>
                                     )}
 
-                                    <div className="transition-all">
-                                        <TimelineItem
-                                            stage={stage}
-                                            index={index}
-                                            isFocused={isFocused}
-                                            isCurrent={isCurrent}
-                                            isPast={isPast}
-                                            isFuture={isFuture}
-                                            activeStageIndex={activeStageIndex}
-                                            onShare={handleShare}
-                                            onMobileClick={(clickedIndex) =>
-                                                setMobilePopupIndex(clickedIndex)
-                                            }
-                                            onScrollTo={() => scrollToIndex(index)}
-                                            isVisible={isVisible}
-                                            distanceFromActive={distanceFromActive}
-                                            isAdmin={true}
-                                            onDelete={stage.id > 12 ? () => handleDeleteClick(stage.id) : undefined}
-                                            onComplete={stage.id === currentActiveStage.id ? handleComplete : undefined}
-                                            onEditPost={(post) => {
-                                                setSelectedStageId(stage.id);
-                                                setPostToEdit(post);
-                                                setShowAnnouncementModal(true);
-                                            }}
-                                            onDeletePost={(postId) => setPostToDelete(postId)}
-                                            onMeetingClick={(meeting) => setSelectedMeeting(meeting)}
-                                        />
-                                    </div>
+                                    <TimelineItem
+                                        stage={stage}
+                                        index={index}
+                                        isFocused={isFocused}
+                                        isCurrent={isCurrent}
+                                        isPast={isPast}
+                                        isFuture={isFuture}
+                                        activeStageIndex={activeStageIndex}
+                                        onShare={handleShare}
+                                        onMobileClick={(idx) => setMobilePopupIndex(idx)}
+                                        onScrollTo={() => scrollToIndex(index)}
+                                        isVisible={isVisible}
+                                        distanceFromActive={distanceFromActive}
+                                        isAdmin={true}
+                                        onDelete={stage.id > 12 ? () => setStageToDelete(stage.id) : undefined}
+                                        onComplete={stage.id === currentActiveStage.id ? (id) => setStageToComplete(id) : undefined}
+                                        onEditPost={(post) => handleEditPost(stage.id, post)}
+                                        onDeletePost={(postId) => setPostToDelete(postId)}
+                                        onMeetingClick={(meeting) => setSelectedMeeting(meeting)}
+                                    />
 
-                                    {/* Insert Between Button */}
                                     {isStructureMode && (
                                         <div className="absolute bottom-[-5dvh] left-1/2 -translate-x-1/2 z-30 translate-y-1/2">
                                             <button
@@ -393,7 +273,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                                         </div>
                                     )}
 
-                                    {/* Add trigger after each stage (Disable in Structure Mode) */}
                                     {!isStructureMode && (
                                         <AddContentTrigger
                                             position={index + 1}
@@ -405,17 +284,11 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                         })}
                     </div>
 
-                    {/* Simplified Announcement Modal */}
+                    {/* Modals & Dialogs */}
                     {(selectedStageId !== null || postToEdit !== null) && (
                         <SimplifiedAnnouncementModal
                             isOpen={showAnnouncementModal}
-                            onClose={() => {
-                                setShowAnnouncementModal(false);
-                                setSelectedStageId(null);
-                                setInitialContentType(null);
-                                setInitialPostType(null);
-                                setPostToEdit(null);
-                            }}
+                            onClose={closeAnnouncementModal}
                             stageId={selectedStageId || postToEdit?.stageId}
                             initialType={initialContentType}
                             initialPostType={initialPostType}
@@ -423,8 +296,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                         />
                     )}
 
-
-                    {/* Stage Manager Modal */}
                     <StageManagerModal
                         isOpen={managerModalProps.isOpen}
                         onClose={() => setManagerModalProps(curr => ({ ...curr, isOpen: false }))}
@@ -435,7 +306,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                         usedIcons={STAGES.map(s => s.iconKey)}
                     />
 
-                    {/* Mobile Popup Modal */}
                     <AnimatePresence>
                         {mobilePopupIndex !== null && (
                             <TimelineMobileModal
@@ -445,10 +315,6 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                                 onShare={handleShare}
                             />
                         )}
-                    </AnimatePresence>
-
-                    {/* Meeting Details Modal (Mobile) */}
-                    <AnimatePresence>
                         {selectedMeeting !== null && (
                             <MeetingDetailsModal
                                 meeting={selectedMeeting}
@@ -457,169 +323,38 @@ export default function AdminTimeline({ stages }: AdminTimelineProps) {
                         )}
                     </AnimatePresence>
 
-                    {/* Delete Confirmation Modal */}
-                    <AnimatePresence>
-                        {stageToDelete !== null && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
-                                    onClick={() => setStageToDelete(null)}
-                                />
-                                <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
-                                    className="bg-card relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-border"
-                                >
-                                    <div className="p-6 text-center">
-                                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mb-4">
-                                            <span className="material-symbols-outlined text-red-600 !text-3xl">
-                                                warning
-                                            </span>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-foreground mb-2">
-                                            Emin misiniz?
-                                        </h3>
-                                        <p className="text-muted-foreground mb-6">
-                                            Bu aşamayı ve içindeki tüm duyuruları silmek üzeresiniz. Bu işlem geri alınamaz.
-                                        </p>
-                                        <div className="flex gap-3 justify-center">
-                                            <button
-                                                onClick={() => setStageToDelete(null)}
-                                                className="px-5 py-2.5 rounded-xl border border-border font-medium hover:bg-secondary transition-colors"
-                                            >
-                                                Vazgeç
-                                            </button>
-                                            <button
-                                                onClick={handleDeleteConfirm}
-                                                className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
-                                            >
-                                                Evet, Sil
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
+                    {/* SOLID Refactor: Reusable Confirm Dialogs */}
+                    <ConfirmDialog
+                        isOpen={stageToDelete !== null}
+                        onClose={() => setStageToDelete(null)}
+                        onConfirm={handleDeleteStageConfirm}
+                        title="Aşamayı Sil?"
+                        description="Bu aşamayı ve içindeki tüm duyuruları silmek üzeresiniz. Bu işlem geri alınamaz."
+                        confirmLabel="Evet, Sil"
+                    />
 
-                    {/* Post Deletion Confirmation Modal */}
-                    <AnimatePresence>
-                        {postToDelete !== null && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
-                                    onClick={() => setPostToDelete(null)}
-                                />
-                                <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
-                                    className="bg-card relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-border"
-                                >
-                                    <div className="p-6 text-center">
-                                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mb-4">
-                                            <span className="material-symbols-outlined text-red-600 !text-3xl">
-                                                delete_forever
-                                            </span>
-                                        </div>
-                                        <h3 className="text-xl font-bold text-foreground mb-2">
-                                            İçeriği Sil
-                                        </h3>
-                                        <p className="text-muted-foreground mb-6">
-                                            Bu içeriği (duyuru/toplantı) silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
-                                        </p>
-                                        <div className="flex gap-3 justify-center">
-                                            <button
-                                                onClick={() => setPostToDelete(null)}
-                                                className="px-5 py-2.5 rounded-xl border border-border font-medium hover:bg-secondary transition-colors"
-                                            >
-                                                Vazgeç
-                                            </button>
-                                            <button
-                                                onClick={handleDeletePostConfirm}
-                                                className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
-                                            >
-                                                Evet, Sil
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
+                    <ConfirmDialog
+                        isOpen={postToDelete !== null}
+                        onClose={() => setPostToDelete(null)}
+                        onConfirm={handleDeletePostConfirm}
+                        title="İçeriği Sil?"
+                        description="Bu içeriği (duyuru/toplantı) silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                        confirmLabel="Evet, Sil"
+                        icon="delete_forever"
+                    />
 
-                    {/* Stage Completion Confirmation Modal */}
-                    <AnimatePresence>
-                        {stageToComplete !== null && (
-                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all"
-                                    onClick={() => setStageToComplete(null)}
-                                />
-                                <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0.9, opacity: 0 }}
-                                    className="bg-card relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-border"
-                                >
-                                    <div className="p-8 text-center">
-                                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100 mb-6">
-                                            <span className="material-symbols-outlined text-green-600 !text-4xl">
-                                                task_alt
-                                            </span>
-                                        </div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">
-                                            Aşamayı Tamamla
-                                        </h3>
-                                        <div className="bg-slate-50 rounded-xl p-4 mb-6 text-sm text-slate-600 text-left space-y-2 border border-slate-100">
-                                            <div className="flex gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 shrink-0" />
-                                                <p>Bu aşama <strong>"TAMAMLANDI"</strong> olarak işaretlenir.</p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 shrink-0" />
-                                                <p>Otomatik bir duyuru taslağı oluşturulur.</p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 shrink-0" />
-                                                <p>Bir sonraki aşama aktif hale getirilir.</p>
-                                            </div>
-                                        </div>
-                                        <p className="text-slate-500 mb-8 font-medium">
-                                            Devam etmek istediğinize emin misiniz?
-                                        </p>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button
-                                                onClick={() => setStageToComplete(null)}
-                                                className="px-6 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
-                                            >
-                                                Vazgeç
-                                            </button>
-                                            <button
-                                                onClick={handleCompleteConfirm}
-                                                className="px-6 py-3 rounded-xl bg-[#98EB94] text-slate-800 font-bold hover:bg-[#7dd979] transition-all shadow-lg shadow-green-200/50 active:scale-95"
-                                            >
-                                                Evet, Tamamla
-                                            </button>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        )}
-                    </AnimatePresence>
+                    <ConfirmDialog
+                        isOpen={stageToComplete !== null}
+                        onClose={() => setStageToComplete(null)}
+                        onConfirm={handleCompleteStageConfirm}
+                        title="Aşamayı Tamamla"
+                        description="Bu aşama 'TAMAMLANDI' olarak işaretlenecek ve bir sonraki aşama aktif hale getirilecektir. Devam etmek istiyor musunuz?"
+                        confirmLabel="Evet, Tamamla"
+                        variant="success"
+                        icon="task_alt"
+                    />
                 </div>
 
-                {/* Stepper Controls - Outside timeline wrapper */}
                 {!showAnnouncementModal && (
                     <StepperControls
                         currentStep={focusedIndex}
